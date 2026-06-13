@@ -3,7 +3,7 @@
 {
   programs.rofi = {
     enable = true;
-    font = "DejaVu Sans Mono 10";
+    font = "DejaVu Sans Mono 9";
     extraConfig = {
       show-icons = false;
       display-drun = "";

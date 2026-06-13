@@ -4,6 +4,14 @@
     enable = true;
     enableZshIntegration = true;
     shellWrapperName = "y";
+    keymap = {
+      mgr.prepend_keymap = [
+        {
+          run = "shell 'wl-copy -t text/uri-list <<< \"file://$@\"'";
+          on = [ "M" ];
+        }
+      ];
+    };
     theme = {
       indicator = {
         padding = { open = "▐"; close = "▌"; };

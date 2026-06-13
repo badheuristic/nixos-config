@@ -17,24 +17,13 @@
         }
       ];
 
-      shape = [
-        {
-          size = "250, 120";
-          position = "60, 40";
-          halign = "left";
-          valign = "bottom";
-          color = "rgba(0, 0, 0, 0.7)";
-          rounding = 0;
-        }
-      ];
-
       label = [
         {
           text = "$TIME";
-          font_size = 54;
-          font_family = "DejaVu Math TeX Gyre";
+          font_size = 32;
+          font_family = "DejaVuSansMono Nerd Font";
           color = "rgba(255, 255, 255, 1.0)";
-          position = "80, 65";
+          position = "80, 130";
           monitor = "eDP-1";
           halign = "left";
           valign = "bottom";
@@ -42,9 +31,9 @@
         {
           text = "cmd[update:1000] echo \"$(date +'%d %B %Y')\"";
           font_size = 12;
-          font_family = "DejaVu Math TeX Gyre";
+          font_family = "DejaVuSansMono Nerd Font";
           color = "rgba(255, 255, 255, 0.7)";
-          position = "80, 45";
+          position = "80, 100";
           monitor = "eDP-1";
           halign = "left";
           valign = "bottom";
@@ -53,17 +42,17 @@
       
       input-field = [
         {
-          size = "250, 50";
-          position = "60, 160";
+          size = "150, 40";
+          position = "80, 45";
           monitor = "eDP-1";
           halign = "left";
           valign = "bottom";
           dots_size = 0.2;
-          dots_spacing = 3;
+          dots_spacing = 0.2;
           dots_center = true;
           dots_text_format = "＊";
           fade_on_empty = true;
-          font_family = "DejaVu Math TeX Gyre";
+          font_family = "DejaVuSansMono Nerd Font";
           font_color = "rgba(255, 255, 255, 1.0)";
           inner_color = "rgba(255, 255, 255, 0.1)";
           outer_color = "rgba(255, 255, 255, 0.5)";

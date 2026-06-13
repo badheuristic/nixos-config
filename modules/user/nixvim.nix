@@ -10,24 +10,7 @@
 
     colorschemes.base16 = {
       enable = true;
-      customColorScheme = {
-        base00 = "#${theme.bg}";
-        base01 = "#${theme.bg_alt}";
-        base02 = "#${theme.alt}";
-        base03 = "#666666";
-        base04 = "#888888";
-        base05 = "#${theme.fg}";
-        base06 = "#eeeeee";
-        base07 = "#ffffff";
-        base08 = "#aaaaaa";
-        base09 = "#999999";
-        base0A = "#bbbbbb";
-        base0B = "#cccccc";
-        base0C = "#dddddd";
-        base0D = "#888888";
-        base0E = "#777777";
-        base0F = "#555555";
-      };
+      colorscheme = "grayscale-dark";
       settings = {
         transparent_mode = true;
       };
@@ -54,7 +37,16 @@
       signcolumn = "yes";
       updatetime = 50;
       colorcolumn = "80";
+      conceallevel = 3;
     };
+
+    autoCmd = [
+      {
+        event = [ "FileType" ];
+        pattern = [ "markdown" "text" "gitcommit" ];
+        command = "setlocal wrap textwidth=80";
+      }
+    ];
 
     extraConfigLua = ''
       vim.opt.isfname:append('@-@')
@@ -118,6 +110,7 @@
           pyright.enable = true; # Python
           ts_ls.enable = true; # TypeScript
           clangd.enable = true;
+          marksman.enable = true; # Markdown
           nixd = {
             enable = true;
             formatting.command = [ "nixfmt" ];
@@ -151,6 +144,7 @@
       { mode = "n"; key = "<leader>sr"; action = "<cmd>SudaRead<CR>"; options.desc = "read as root"; }
       { mode = "n"; key = "<leader>sw"; action = "<cmd>SudaWrite<CR>"; options.desc = "write as root"; }
       { mode = "n"; key = "<leader>ev"; action = ":ex "; }
+      { mode = "n"; key = "<leader>nn"; action = "<cmd>Ex ~/Notes<CR>"; options.desc = "open Notes"; }
       
       { mode = "v"; key = "J"; action = ":m '>+1<CR>gv=gv"; }
       { mode = "v"; key = "K"; action = ":m '<-2<CR>gv=gv"; }
