@@ -36,7 +36,6 @@ in
     "amdgpu.ip_block_mask=0xfffff7ff"
     "nvme_core.default_ps_max_latency_us=0"
     "pcie_aspm=off"
-    "mem_sleep_default=deep"
     "amdgpu.audio=1"
   ];
   services.udev.extraRules = ''
@@ -85,7 +84,10 @@ in
     enable32Bit = true;
   };
 
-  virtualisation.docker.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = false;
+  };
   services.flatpak.enable = true;
 
   programs.steam = {
