@@ -33,8 +33,8 @@ in
     claude-code
     uget
     qbittorrent
-    fastfetch
-    feh
+    swaybg
+    swayimg
     pavucontrol
     brightnessctl
     bluetuith
@@ -87,22 +87,32 @@ in
     };
   };
 
-  programs.vesktop.enable = true;
 
-  services.hyprpaper = let
-    wallpaper_path = "${../../assets/checker.png}";
-  in {
+
+  xdg.mimeApps = {
     enable = true;
-    settings = {
-      ipc = "on";
-      splash = false;
-      wallpaper = [
-        {
-          monitor = "";
-          path = "${wallpaper_path}";
-          fit_mode = "cover";
-        }
-      ];
+    defaultApplications = {
+      "image/png" = [ "swayimg.desktop" ];
+      "image/jpeg" = [ "swayimg.desktop" ];
+      "image/gif" = [ "swayimg.desktop" ];
+      "image/webp" = [ "swayimg.desktop" ];
+      "image/x-webp" = [ "swayimg.desktop" ];
+      "image/svg+xml" = [ "swayimg.desktop" ];
+      "audio/ogg" = [ "mpv.desktop" ];
+      "audio/oga" = [ "mpv.desktop" ];
+      "audio/x-vorbis+ogg" = [ "mpv.desktop" ];
+      "audio/mpeg" = [ "mpv.desktop" ];
+      "audio/mp3" = [ "mpv.desktop" ];
+      "audio/flac" = [ "mpv.desktop" ];
+      "audio/wav" = [ "mpv.desktop" ];
+      "audio/x-wav" = [ "mpv.desktop" ];
+      "audio/opus" = [ "mpv.desktop" ];
+      "audio/x-opus+ogg" = [ "mpv.desktop" ];
+      "video/mp4" = [ "mpv.desktop" ];
+      "video/webm" = [ "mpv.desktop" ];
+      "video/x-matroska" = [ "mpv.desktop" ];
+      "video/quicktime" = [ "mpv.desktop" ];
+      "video/x-msvideo" = [ "mpv.desktop" ];
     };
   };
 

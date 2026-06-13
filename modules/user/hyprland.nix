@@ -13,6 +13,7 @@
       exec-once = [
         "waybar"
         "dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+        "swaybg -i ${../../assets/checker.png} -m fill"
       ];
 
       # input
