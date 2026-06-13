@@ -7,6 +7,26 @@ in
   # nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  sops.defaultSopsFile = ../../secrets/secrets.yaml;
+  sops.defaultSopsFormat = "yaml";
+  sops.age.keyFile = "/home/badheuristic/.config/sops/age/keys.txt";
+
+  sops.secrets."discord_token" = {
+    owner = "badheuristic";
+  };
+  sops.secrets."aerc_gmail_1" = {
+    owner = "badheuristic";
+  };
+  sops.secrets."aerc_gmail_2" = {
+    owner = "badheuristic";
+  };
+  sops.secrets."aerc_gmail_3" = {
+    owner = "badheuristic";
+  };
+  sops.secrets."aerc_gmail_4" = {
+    owner = "badheuristic";
+  };
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
