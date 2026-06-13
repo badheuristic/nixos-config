@@ -176,9 +176,6 @@ in
 
   environment.systemPackages = with pkgs; [
     git
-    firefox
-    kitty
-    hyprlock
     python3
     gcc
     # wineasio

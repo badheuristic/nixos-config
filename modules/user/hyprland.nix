@@ -50,6 +50,7 @@
         rounding_power = 2;
         active_opacity = 0.95;
         inactive_opacity = 0.9;
+        fullscreen_opacity = 0.95;
         blur = {
           enabled = false;
         };
@@ -112,9 +113,10 @@
         "match:class .*,suppress_event maximize"
         "match:class ^$,match:title ^$,match:xwayland true,match:float true,match:fullscreen false,match:pin false,no_focus true"
         "match:class hyprland-run,move 20 monitor_h-120,float yes"
-        "match:class ^(firefox)$,opacity 1.0 override 1.0 override"
+        "match:initial_class ^(firefox-beta)$,opacity 1.0 override 1.0 override"
         "match:initial_class ^(kitty)$,match:initial_class ^(obsidian)$,opacity 0.87 override 0.80 override 0.77 override"
         "match:title ^(btop)$,opacity 0.9 0.87"
+        "match:initial_class ^(mpv)$,opacity 1.0 override 1.0 override 1.0 override"
         "match:initial_class ^(com.github.xournalpp.xournalpp)$,opacity 0.90 0.87"
         "match:class ^(hhd-ui)$,float true,pin true,stay_focused true,focus_on_activate true"
         "match:class ^(Spotify|spotify)$,opacity 0.90 override 0.87 override"
@@ -149,7 +151,7 @@
         "ALT, F7, exec, hyprctl keyword monitor eDP-1,2560x1600@60,auto,1"
         "ALT, bracketleft, exec, hyprctl keyword debug:overlay false"
         "ALT, bracketright, exec, hyprctl keyword debug:overlay true"
-        "ALT, V, exec, cliphist list | rofi -dmenu -p \"\"| cliphist decode | wl-copy "
+        "ALT SHIFT, V, exec, cliphist list | rofi -dmenu -p \"\"| cliphist decode | wl-copy "
         "$mod, h, movefocus, l"
         "$mod, j, movefocus, d"
         "$mod, k, movefocus, u"

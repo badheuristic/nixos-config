@@ -4,16 +4,6 @@
     settings = {
       # "$schema" removed — not needed at runtime, can cause serialization issues
 
-      logo = {
-        type = "kitty";
-        source = ../../assets/nixos.png;
-        width = 10;
-        height = 5;
-        padding = {
-          top = 1;
-          left = 2;
-        };
-      };
 
       display = {
         separator = "  ";
