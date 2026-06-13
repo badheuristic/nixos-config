@@ -23,8 +23,6 @@ in
     ../../modules/user/yazi.nix
     ../../modules/user/tmux.nix
     ../../modules/user/fastfetch.nix
-    ../../modules/user/spicetify.nix
-    ../../modules/user/vesktop.nix
   ];
   # nixpkgs.config.allowUnfree = true;
 
@@ -32,7 +30,6 @@ in
   home.homeDirectory = "/home/badheuristic";
 
   home.packages = with pkgs; [
-    obsidian
     claude-code
     uget
     qbittorrent
@@ -57,10 +54,12 @@ in
     texlive.combined.scheme-full
     sc-controller
     # dualsensectl
-    antigravity
     codex
-    discordo
+    inputs.concord.packages.${pkgs.system}.default
     aerc
+    ncdu
+    calcurse
+    spotify-player
     #postman
     imagemagick
     ffmpeg
@@ -68,11 +67,12 @@ in
     xournalpp
     wvkbd-deskintl
     mixxx
-    nchat
-    slsk-batchdl
-    (rpcs3.overrideAttrs (prev: {
-      cmakeFlags = prev.cmakeFlags ++ [ (lib.cmakeBool "BUILD_SHARED_LIBS" false) ];
+    (nchat.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or []) ++ [ pkgs.libpng ];
     }))
+    slsk-batchdl
+    # rpcs3 # Currently broken in nixos-unstable (GLEW linking error)
+    sops
   ];
 
   services.cliphist.enable = true;
