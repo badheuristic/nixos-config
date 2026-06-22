@@ -59,7 +59,7 @@
           outline_thickness = 0;
           placeholder_text = " ";
           hide_input = false;
-          rounding = 0;
+          rounding = 8;
         }
       ];
     };

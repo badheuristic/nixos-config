@@ -3,14 +3,16 @@
 {
   programs.rofi = {
     enable = true;
-    font = "DejaVu Sans Mono 9";
+    # font = "DejaVu Sans Mono 9";
+    font = "DejaVu Sans 10";
     extraConfig = {
       show-icons = false;
-      display-drun = "";
-      display-run = "";
+      display-drun = "";
+      display-run = "";
       drun-display-format = "{name}";
-      location = 3; # 3 = East
-      anchor = "east";
+      location = 0; # 0 = Center
+      anchor = "center";
+      yoffset = -150;
     };
     theme = let
       inherit (config.lib.formats.rasi) mkLiteral;
@@ -28,11 +30,11 @@
         spacing = 0;
       };
       "window" = {
-        width = mkLiteral "300px";
+        width = mkLiteral "600px";
         border = mkLiteral "1px solid";
         border-color = mkLiteral "@border-color";
+        border-radius = mkLiteral "8px";
         background-color = mkLiteral "@background-color";
-        height = mkLiteral "100%";
         transparency = "real";
       };
       "mainbox" = {
@@ -40,7 +42,12 @@
         children = map mkLiteral [ "inputbar" "listview" ];
       };
       "inputbar" = {
-        padding = mkLiteral "10px";
+        padding = mkLiteral "15px 20px";
+        children = map mkLiteral [ "prompt" "entry" ];
+      };
+      "prompt" = {
+        text-color = mkLiteral "@foreground-alt";
+        padding = mkLiteral "0 12px 0 0";
       };
       "entry" = {
         text-color = mkLiteral "@foreground-alt";
@@ -50,9 +57,10 @@
       "listview" = {
         background-color = mkLiteral "@background-color";
         spacing = 0;
+        lines = 5;
       };
       "element" = {
-        padding = mkLiteral "4px";
+        padding = mkLiteral "10px 20px";
         background-color = mkLiteral "#00000000";
         text-color = mkLiteral "@text-color";
       };

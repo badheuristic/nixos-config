@@ -46,7 +46,7 @@
       };
 
       decoration = {
-        rounding = 0;
+        rounding = 8;
         rounding_power = 2;
         active_opacity = 0.95;
         inactive_opacity = 0.9;
@@ -112,7 +112,7 @@
         "match:class .*,suppress_event maximize"
         "match:class ^$,match:title ^$,match:xwayland true,match:float true,match:fullscreen false,match:pin false,no_focus true"
         "match:class hyprland-run,move 20 monitor_h-120,float yes"
-        "match:initial_class ^(firefox-beta)$,opacity 1.0 override 1.0 override"
+        "match:initial_class ^(zen-beta)$,opacity 1.0 override 1.0 override 1.0 override"
         "match:initial_class ^(kitty)$,match:initial_class ^(obsidian)$,opacity 0.87 override 0.80 override 0.77 override"
         "match:title ^(btop)$,opacity 0.9 0.87"
         "match:initial_class ^(mpv)$,opacity 1.0 override 1.0 override 1.0 override"
@@ -148,7 +148,7 @@
         "$mod SHIFT, Space, exec, $(hyprctl activewindow -j | jq '.floating') && hyprctl dispatch cyclenext tiled || hyprctl dispatch cyclenext floating"
         "ALT, F8, exec, hyprctl keyword monitor eDP-1,2560x1600@180,auto,1"
         "ALT, F7, exec, hyprctl keyword monitor eDP-1,2560x1600@60,auto,1"
-        "ALT, bracketleft, exec, hyprctl keyword debug:overlay false"
+        "ALT, bracketleft, exec, hyprctl keyword debug:overlay false && sleep 1 && hyprctl keyword debug:damage_tracking 0 && hyprctl keyword debug:damage_tracking 2"
         "ALT, bracketright, exec, hyprctl keyword debug:overlay true"
         "ALT SHIFT, V, exec, cliphist list | rofi -dmenu -p \"\"| cliphist decode | wl-copy "
         "$mod, h, movefocus, l"

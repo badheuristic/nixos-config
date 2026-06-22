@@ -6,8 +6,9 @@
     settings = {
       mainBar = {
         layer = "top";
-        position = "bottom";
-        height = 24;
+        position = "top";
+        margin = "8px 8px 0px 8px";
+        height = 30;
         spacing = 4;
         
         modules-left = [ "hyprland/workspaces" "hyprland/window" ];
@@ -35,58 +36,58 @@
         };
 
         "clock" = {
-          format = "{:%Y-%m-%d %H:%M}";
+          format = "{:%A %B %d; %H:%M}";
           tooltip = false;
         };
 
         network = {
-          format-wifi = "wifi: {essid}";
-          format-ethernet = "eth";
-          format-disconnected = "offline";
+          format-wifi = "  {essid}";
+          format-ethernet = "󰈀 ";
+          format-disconnected = "󰖪 ";
           on-click = "nmgui";
           tooltip = false;
         };
 
         bluetooth = {
-          format = "BT: {status}";
-          format-disabled = "bt: OFF";
-          format-connected = "bt: {device_alias}";
+          format = " {status}";
+          format-disabled = "󰂲 ";
+          format-connected = " {device_alias}";
           on-click = "blueman-manager";
           tooltip = false;
         };
 
         pulseaudio = {
-          format = "vol: {volume}%";
-          format-muted = "vol: MUTED";
+          format = "  {volume}%";
+          format-muted = "  MUTED";
           on-click = "pavucontrol";
           tooltip = false;
         };
 
         battery = {
           states = { warning = 30; critical = 15; };
-          format = "bat: {capacity}%";
-          format-charging = "chr: {capacity}%";
-          format-plugged = "plg: {capacity}%";
+          format = "  {capacity}%";
+          format-charging = "󰂄 {capacity}%";
+          format-plugged = "  {capacity}%";
           tooltip = false;
         };
 
         temperature = {
-          format = "temp: {temperatureC}°C";
+          format = " {temperatureC}°C";
           tooltip = false;
         };
 
         cpu = {
-          format = "cpu: {usage}%";
+          format = "  {usage}%";
           tooltip = false;
         };
 
         memory = {
-          format = "ram: {used:0.1f}G";
+          format = "  {used:0.1f}G";
           tooltip = false;
         };
 
         disk = {
-          format = "dsk: {percentage_used}%";
+          format = "  {percentage_used}%";
           path = "/";
           tooltip = false;
         };
@@ -100,8 +101,9 @@
 
     style = ''
       * {
-        font-family: monospace;
-        font-size: 12px;
+        /* font-family: monospace, "DejaVuSansM Nerd Font"; */
+        font-family: sans-serif, "DejaVu Sans";
+        font-size: 13px;
         border: none;
         border-radius: 0;
         min-height: 0;
@@ -111,9 +113,10 @@
       }
 
       window#waybar {
-        background-color: #${theme.bg};
+        background-color: alpha(#${theme.bg}, 0.93);
         color: #${theme.fg};
-        border-top: 1px solid #${theme.bg_alt};
+        border-radius: 8px;
+        border: 1px solid #${theme.bg_alt};
       }
 
       /* Base padding for all modules to prevent text from hitting edges */
