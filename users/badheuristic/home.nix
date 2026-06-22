@@ -18,11 +18,12 @@ in
     ../../modules/user/zsh.nix
     ../../modules/user/cava.nix
     ../../modules/user/nixvim.nix
-    ../../modules/user/firefox.nix
+    ../../modules/user/zen.nix
     ../../modules/user/gtk.nix
     ../../modules/user/yazi.nix
     ../../modules/user/tmux.nix
     ../../modules/user/fastfetch.nix
+
   ];
   # nixpkgs.config.allowUnfree = true;
 
@@ -30,6 +31,7 @@ in
   home.homeDirectory = "/home/badheuristic";
 
   home.packages = with pkgs; [
+    vesktop
     claude-code
     uget
     qbittorrent
@@ -55,11 +57,10 @@ in
     sc-controller
     # dualsensectl
     codex
-    inputs.concord.packages.${pkgs.system}.default
-    aerc
+
     ncdu
-    calcurse
-    spotify-player
+    obsidian
+    spotify
     #postman
     imagemagick
     ffmpeg
@@ -67,12 +68,11 @@ in
     xournalpp
     wvkbd-deskintl
     mixxx
-    (nchat.overrideAttrs (old: {
-      buildInputs = (old.buildInputs or []) ++ [ pkgs.libpng ];
-    }))
     slsk-batchdl
     # rpcs3 # Currently broken in nixos-unstable (GLEW linking error)
     sops
+    tldr
+    fzf
   ];
 
   services.cliphist.enable = true;
