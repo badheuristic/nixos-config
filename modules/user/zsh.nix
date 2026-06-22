@@ -33,4 +33,8 @@
       bindkey "^[[4~" end-of-line
     '';
   };
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 }

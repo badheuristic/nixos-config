@@ -73,8 +73,6 @@ in
     sops
     tldr
     fzf
-    direnv
-    nix-direnv
   ];
 
   services.cliphist.enable = true;
