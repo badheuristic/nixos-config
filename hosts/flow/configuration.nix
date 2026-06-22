@@ -187,17 +187,17 @@ in
     XDG_DATA_DIRS = [ "$XDG_DATA_DIRS" "$HOME/.local/share/flatpak/exports/share" "/var/lib/flatpak/exports/share" ];
   };
 
-  systemd.services.z13ctl = {
-    description = "z13ctl daemon";
-    after = [ "multi-user.target" "hhd.service" ];
-    wants = [ "hhd.service" ];
-    serviceConfig = {
-      ExecStart = "${z13ctl}/bin/z13ctl daemon --no-button";
-      Restart = "always";
-      CPUSchedulingPolicy = "idle";
-    };
-    wantedBy = [ "multi-user.target" ];
-  };
+  # systemd.services.z13ctl = {
+  #   description = "z13ctl daemon";
+  #   after = [ "multi-user.target" "hhd.service" ];
+  #   wants = [ "hhd.service" ];
+  #   serviceConfig = {
+  #     ExecStart = "${z13ctl}/bin/z13ctl daemon --no-button";
+  #     Restart = "always";
+  #     CPUSchedulingPolicy = "idle";
+  #   };
+  #   wantedBy = [ "multi-user.target" ];
+  # };
 
   zramSwap.enable = true;
   system.stateVersion = "24.05";
