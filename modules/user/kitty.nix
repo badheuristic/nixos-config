@@ -5,7 +5,7 @@
     enable = true;
     font = {
       name = "DejaVuSansMono Nerd Font";
-      size = 10;
+      size = 10.5;
     };
     settings = {
       background = "#${theme.bg}";
@@ -38,6 +38,7 @@
       shell_integration = "no-rc no-cursor";
       confirm_os_window_close = 0;
       text_composition_strategy = "legacy";
+      cursor_trail = 1;
     };
   };
 }

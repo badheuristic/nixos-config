@@ -1,9 +1,10 @@
-{ config, pkgs, theme, ... }:
+{ config, pkgs, theme, inputs, ... }:
 
 {
   programs.nixvim = {
     enable = true;
     defaultEditor = true;
+    nixpkgs.source = inputs.nixpkgs;
     nixpkgs.config.allowUnfree = true;
 
     globals.mapleader = " ";
@@ -46,6 +47,11 @@
         pattern = [ "markdown" "text" "gitcommit" ];
         command = "setlocal wrap textwidth=80";
       }
+      {
+        event = [ "ColorScheme" "VimEnter" ];
+        pattern = [ "*" ];
+        command = "hi StatusLine guibg=NONE ctermbg=NONE | hi StatusLineNC guibg=NONE ctermbg=NONE";
+      }
     ];
 
     extraConfigLua = ''
@@ -55,7 +61,12 @@
     plugins = {
       web-devicons.enable = true;
       which-key.enable = true;
-      transparent.enable = true;
+      transparent = {
+        enable = true;
+        settings = {
+          extra_groups = [ "StatusLine" "StatusLineNC" "lualine_c_normal" "lualine_c_inactive" ];
+        };
+      };
       lazygit.enable = true;
       tmux-navigator.enable = true;
       lualine = {
@@ -63,7 +74,29 @@
         settings = {
           options = {
             component_separators = { left = ""; right = ""; };
-            section_separators = { left = ""; right = ""; };
+            section_separators = { left = ""; right = ""; };
+            theme = {
+              __raw = ''
+                (function()
+                  local theme = require("lualine.themes.base16")
+                  for _, mode in pairs({ "normal", "insert", "visual", "command", "replace", "inactive" }) do
+                    if theme[mode] then
+                      theme[mode].c = theme[mode].c or {}
+                      theme[mode].c.bg = 'NONE'
+                    end
+                  end
+                  return theme
+                end)()
+              '';
+            };
+          };
+          sections = {
+            lualine_a = pkgs.lib.mkForce [ { __unkeyed-1 = "mode"; separator = { left = ""; }; padding = { left = 1; right = 1; }; } ];
+            lualine_b = pkgs.lib.mkForce [ "branch" "filename" ];
+            lualine_c = pkgs.lib.mkForce [ { __unkeyed-1 = "%="; separator = ""; padding = 0; } ];
+            lualine_x = pkgs.lib.mkForce [ "" ];
+            lualine_y = pkgs.lib.mkForce [ "filetype" "progress" ];
+            lualine_z = pkgs.lib.mkForce [ { __unkeyed-1 = "location"; separator = { right = ""; }; padding = { left = 1; right = 1; }; } ];
           };
         };
       };
