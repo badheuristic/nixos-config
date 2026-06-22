@@ -40,7 +40,7 @@
 
 (deflayer symbols
   grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc  ins  home pgup  nlck kp/  kp*  kp-
-  tab  S-1  S-2  S-3  S-4  S-5  caps =    +    S-9  S-0  \    |    ret   del  end  pgdn  kp7  kp8  kp9  kp+
+  tab  q    w    e    pgup pgdn caps =    +    S-9  S-0  \    |    ret   del  end  pgdn  kp7  kp8  kp9  kp+
   caps a    s    \    |    g    left down up   rght [    ]    /                    kp4  kp5  kp6
   lsft z    x    c    home `    ~    S-[  S-]  -    S--  rsft            up   kp1  kp2  kp3  kprt
   rctl lmet lalt           end                 		 ralt rmet left down  rght kp0   kp.
