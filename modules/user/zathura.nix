@@ -14,7 +14,7 @@
       highlight-active-color = "#${theme.urgent}";
       font = "D2CodingLigature Nerd Font 12";
       
-      recolor = true;
+      recolor = false;
       recolor-lightcolor = "#${theme.bg}";
       recolor-darkcolor = "#${theme.fg}";
       recolor-keephue = true;
