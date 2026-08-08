@@ -21,7 +21,7 @@
         {
           text = "$TIME";
           font_size = 32;
-          font_family = "DejaVuSansMono Nerd Font";
+          font_family = "Hack Nerd Font";
           color = "rgba(255, 255, 255, 1.0)";
           position = "80, 130";
           monitor = "eDP-1";
@@ -31,7 +31,7 @@
         {
           text = "cmd[update:1000] echo \"$(date +'%d %B %Y')\"";
           font_size = 12;
-          font_family = "DejaVuSansMono Nerd Font";
+          font_family = "Hack Nerd Font";
           color = "rgba(255, 255, 255, 0.7)";
           position = "80, 100";
           monitor = "eDP-1";
@@ -52,7 +52,7 @@
           dots_center = true;
           dots_text_format = "＊";
           fade_on_empty = true;
-          font_family = "DejaVuSansMono Nerd Font";
+          font_family = "Hack Nerd Font";
           font_color = "rgba(255, 255, 255, 1.0)";
           inner_color = "rgba(255, 255, 255, 0.1)";
           outer_color = "rgba(255, 255, 255, 0.5)";

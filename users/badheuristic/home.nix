@@ -12,7 +12,7 @@ in
     ../../modules/user/hyprlock.nix
     ../../modules/user/waybar.nix
     ../../modules/user/zathura.nix
-    ../../modules/user/rofi.nix
+    ../../modules/user/wofi.nix
     ../../modules/user/mako.nix
     ../../modules/user/kitty.nix
     ../../modules/user/zsh.nix
@@ -23,7 +23,6 @@ in
     ../../modules/user/yazi.nix
     ../../modules/user/tmux.nix
     ../../modules/user/fastfetch.nix
-
   ];
   # nixpkgs.config.allowUnfree = true;
 
@@ -31,15 +30,15 @@ in
   home.homeDirectory = "/home/badheuristic";
 
   home.packages = with pkgs; [
-    vesktop
+    reaper
     claude-code
-    uget
+    #uget
     qbittorrent
     swaybg
     swayimg
     pavucontrol
     brightnessctl
-    bluetuith
+    #bluetuith
     nmgui
     antigravity
     ripgrep
@@ -49,19 +48,18 @@ in
     obs-studio
     mpv
     lutris
+    rpcs3
+    pcsx2
     wineWow64Packages.stable
     winetricks
     protonup-qt
-    # (bottles.override { removeWarningPopup = true; })
     texlive.combined.scheme-full
     sc-controller
-    # dualsensectl
     codex
 
     ncdu
     obsidian
     spotify
-    #postman
     imagemagick
     ffmpeg
     yt-dlp
@@ -69,7 +67,6 @@ in
     wvkbd-deskintl
     mixxx
     slsk-batchdl
-    # rpcs3 # Currently broken in nixos-unstable (GLEW linking error)
     sops
     tldr
     fzf

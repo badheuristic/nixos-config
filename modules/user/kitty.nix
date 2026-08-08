@@ -4,7 +4,7 @@
   programs.kitty = {
     enable = true;
     font = {
-      name = "DejaVuSansMono Nerd Font";
+      name = "Hack Nerd Font";
       size = 10.5;
     };
     settings = {

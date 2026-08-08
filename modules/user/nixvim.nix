@@ -127,6 +127,7 @@
         settings.mapping = {
           "<Tab>" = "cmp.mapping.confirm({ select = true })";
           "<S-Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+          "<Esc>" = "cmp.mapping(function(fallback) cmp.close(); fallback() end, {'i', 's'})";
         };
       };
 
@@ -146,7 +147,9 @@
           marksman.enable = true; # Markdown
           nixd = {
             enable = true;
-            formatting.command = [ "nixfmt" ];
+            settings = {
+              formatting.command = [ "nixfmt" ];
+            };
           };
         };
         keymaps = {
@@ -154,15 +157,15 @@
             "<leader>j" = "goto_next";
             "<leader>k" = "goto_prev";
           };
-        };
-        lspBuf = {
-          "K" = "hover";
-          "gD" = "references";
-          "gd" = "definition";
-          "gi" = "implementation";
-          "gt" = "type_definition";
-          "<leader>rn" = "rename";
-          "<leader>ca" = "code_action";
+          lspBuf = {
+            "K" = "hover";
+            "gD" = "references";
+            "gd" = "definition";
+            "gi" = "implementation";
+            "gt" = "type_definition";
+            "<leader>rn" = "rename";
+            "<leader>ca" = "code_action";
+          };
         };
       };
     };

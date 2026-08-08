@@ -113,6 +113,8 @@ in
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       nerd-fonts.dejavu-sans-mono
+      nerd-fonts.hack
+      hack-font
       #dejavu_fonts
       #nerd-fonts.departure-mono
 
@@ -120,9 +122,9 @@ in
     ];
     fontconfig = {
       defaultFonts = {
-        sansSerif = [ "DejaVu Sans" "Noto Sans CJK SC" ];
-        serif = [ "DejaVu Serif" "Noto Sans CJK SC" ];
-        monospace = [ "DejaVu Sans Mono" "Noto Sans CJK SC" ];
+        sansSerif = [ "DejaVu Sans" ];
+        serif = [ "DejaVu Serif" ];
+        monospace = [ "Hack Nerd Font" "Hack" ];
         # monospace = [ "DepartureMono Nerd Font" "Not Sans Mono CJK SC" ];
         emoji = [ "Noto Color Emoji" ];
       };
@@ -169,10 +171,7 @@ in
     enable = true;
   };
   services.power-profiles-daemon.enable = true;
-  services.handheld-daemon = {
-      enable = true;
-      user = "badheuristic";
-  };
+
 
   environment.systemPackages = with pkgs; [
     git
