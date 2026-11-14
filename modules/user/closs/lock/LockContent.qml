@@ -161,21 +161,30 @@ FocusScope {
         Row {
             anchors.centerIn: parent
             visible: root.typing
-            spacing: 6
-
+            // fixed pool: dots already typed stay put, only the new one animates
             Repeater {
-                model: Math.min(root.length, 24)
-                Rectangle {
+                model: 24
+                Item {
+                    id: slot
                     required property int index
-                    width: 8
+                    readonly property bool shown: index < root.length
+                    width: shown ? 14 : 0
                     height: 8
-                    radius: 4
-                    color: Colors.fg
-                    opacity: root.lock?.busy ? 0.35 + 0.65 * Math.abs(Math.sin((pulse.t + index * 0.35))) : 1
-                    scale: 0
-                    Component.onCompleted: scale = 1
-                    Behavior on scale {
-                        NumberAnimation { duration: 160; easing.type: Easing.OutBack }
+                    Behavior on width {
+                        NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+                    }
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: Colors.fg
+                        opacity: root.lock?.busy ? 0.35 + 0.65 * Math.abs(Math.sin((pulse.t + slot.index * 0.35))) : 1
+                        scale: slot.shown ? 1 : 0
+                        Behavior on scale {
+                            NumberAnimation { duration: 160; easing.type: Easing.OutBack }
+                        }
                     }
                 }
             }
