@@ -68,7 +68,9 @@ Scope {
             left: true
             right: true
         }
-        implicitHeight: Style.windowSpan
+        // full height so tall views (control centre) are never clipped;
+        // the mask keeps everything but the island click-through
+        implicitHeight: scope.modelData.height
         color: "transparent"
         exclusiveZone: Style.notch ? Style.restHeight : Style.restHeight + Style.floatGap
         WlrLayershell.layer: WlrLayer.Overlay
@@ -93,7 +95,9 @@ Scope {
             id: body
 
             readonly property Item slot: views.slotFor(scope.current)
-            property real radius: scope.expanded ? Style.radius : Style.restRadius
+            // the resting pill is fully round: a 14px radius on a 32px body
+            // left a short flat edge where the two corners should meet
+            property real radius: scope.expanded ? Style.radius : Style.notch ? Style.restRadius : Style.restHeight / 2
 
             width: Math.max(slot ? slot.implicitWidth : 0, 80)
             height: Math.max(slot ? slot.implicitHeight : 0, Style.restHeight)
@@ -215,6 +219,11 @@ Scope {
                         name: "armoury"
                         current: scope.current
                         content: Component { ArmouryView {} }
+                    }
+                    ViewSlot {
+                        name: "tray"
+                        current: scope.current
+                        content: Component { TrayView {} }
                     }
                     ViewSlot {
                         name: "polkit"

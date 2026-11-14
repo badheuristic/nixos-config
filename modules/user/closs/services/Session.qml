@@ -3,29 +3,22 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 Singleton {
     id: root
 
-    // Lock state is mirrored to a marker file so that if the shell ever
-    // crashes while locked, it re-locks immediately when systemd restarts it.
-    property bool locked: false
-    property bool ready: false
-
     readonly property string user: Quickshell.env("USER") ?? "user"
     property string uptime: ""
 
+    // hyprlock does the locking. It reads the wallpaper through a link
+    // (refreshed here so it matches the desktop) and has one config per
+    // island shape so its island matches too.
     function lock(): void {
-        if (locked)
-            return;
         Closs.close();
-        locked = true;
-        marker.setText("1\n");
-    }
-
-    function unlocked(): void {
-        locked = false;
-        marker.setText("");
+        Quickshell.execDetached(["sh", "-c",
+            'mkdir -p "$HOME/.cache/closs" && ln -sfn "$1" "$HOME/.cache/closs/lock-wallpaper"; pidof hyprlock >/dev/null || exec hyprlock -c "$HOME/.config/hypr/hyprlock-$2.conf"',
+            "sh", Wallpapers.current, Style.notch ? "notch" : "pill"]);
     }
 
     function suspend(): void {
@@ -43,18 +36,6 @@ Singleton {
 
     function refreshUptime(): void {
         uptimeFile.reload();
-    }
-
-    FileView {
-        id: marker
-        path: Quickshell.statePath("locked")
-        printErrors: false
-        onLoaded: {
-            if (text().trim() === "1")
-                root.locked = true;
-            root.ready = true;
-        }
-        onLoadFailed: root.ready = true
     }
 
     FileView {

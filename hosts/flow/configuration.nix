@@ -156,6 +156,7 @@
   # Closs shell dependencies
   services.upower.enable = true;        # battery in the island
   services.gvfs.enable = true;          # Nautilus trash/mounts
+  programs.gpu-screen-recorder.enable = true; # capture without a password prompt
   programs.kdeconnect.enable = true;    # opens 1714-1764 for the phone link
   programs.dconf.enable = true;
   # Secret Service (libsecret) so apps stop falling back to plaintext.
@@ -165,8 +166,7 @@
   security.pam.services.ly.enableGnomeKeyring = true;
   programs.seahorse.enable = true; # "Passwords and Keys", to browse/manage it
 
-  security.pam.services.closs = { }; # the island's lock screen
-  security.pam.services.hyprlock = { }; # fallback locker
+  security.pam.services.hyprlock = { }; # lock screen
 
   services.kmonad = {
     enable = true;

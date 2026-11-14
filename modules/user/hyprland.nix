@@ -5,6 +5,10 @@
 # Closs island handling every piece of shell UI.
 let
   qs = "${pkgs.quickshell}/bin/qs -c closs ipc call";
+  # media keys: Spotify whenever it's running, else any player but a
+  # browser (Zen registers as firefox.instance_*), so a paused video never
+  # gets resumed by accident; matches services/Media.qml in the shell
+  player = "playerctl -p spotify,%any -i firefox,chromium,zen,brave,vivaldi";
   rgba = hex: alpha: "rgba(${hex}${alpha})";
 
   # Super+Space: hop between tiled and floating windows (sway's focus mode_toggle)
@@ -163,8 +167,8 @@ in
         force_default_wallpaper = 0;
         background_color = "0x${theme.black}";
         focus_on_activate = true;
-        # If the island crashes while locked, systemd restarts it and it
-        # re-acquires the lock instead of leaving a dead screen.
+        # If hyprlock crashes, a new one can take the lock over
+        # (hyprctl --instance 0 dispatch exec hyprlock from a TTY).
         allow_session_lock_restore = true;
       };
 
@@ -206,12 +210,14 @@ in
         "$mod, D, global, closs:launcher"
         "$mod, V, global, closs:clipboard"
         "$mod, A, global, closs:control"
-        "$mod, S, global, closs:dashboard"
+        "$mod, X, global, closs:tray"
         "$mod, N, global, closs:calendar"
-        "$mod SHIFT, W, global, closs:wallpaper"
+        "$mod, S, global, closs:dashboard"
+        "$mod, G, global, closs:wallpaper"
         "$mod, Escape, global, closs:power"
         "$mod, M, global, closs:lock"
         ", XF86Launch3, global, closs:armoury" # Armoury Crate key (KEY_PROG3)
+        "$mod, semicolon, global, closs:armoury"
 
         # Session
         "$mod SHIFT, Escape, exit"
@@ -255,14 +261,13 @@ in
         "$mod SHIFT, G, exec, hyprctl reload"
 
         # Workspaces: Q W E R T = 1-5, number row = 1-10.
-        # mod+Shift+W is the wallpaper picker, so move-to-2 is mod+Shift+2.
         "$mod, mouse_down, workspace, e+1"
         "$mod, mouse_up, workspace, e-1"
       ]
       ++ (lib.concatLists (lib.imap1 (i: key: [
         "$mod, ${key}, workspace, ${toString i}"
-      ] ++ lib.optional (key != "W") "$mod SHIFT, ${key}, movetoworkspace, ${toString i}"
-      ) [ "Q" "W" "E" "R" "T" ]))
+        "$mod SHIFT, ${key}, movetoworkspace, ${toString i}"
+      ]) [ "Q" "W" "E" "R" "T" ]))
       ++ (lib.concatLists (lib.genList (i: let ws = i + 1; key = toString (lib.mod ws 10); in [
         "$mod, ${key}, workspace, ${toString ws}"
         "$mod SHIFT, ${key}, movetoworkspace, ${toString ws}"
@@ -285,10 +290,10 @@ in
         ", XF86AudioMute, exec, ${qs} osd volumeMute"
         ", XF86AudioMicMute, exec, ${qs} osd micMute"
         "$mod, slash, exec, ${qs} osd volumeMute"
-        ", XF86AudioPlay, exec, playerctl play-pause"
-        ", XF86AudioPause, exec, playerctl play-pause"
-        ", XF86AudioNext, exec, playerctl next"
-        ", XF86AudioPrev, exec, playerctl previous"
+        ", XF86AudioPlay, exec, ${player} play-pause"
+        ", XF86AudioPause, exec, ${player} play-pause"
+        ", XF86AudioNext, exec, ${player} next"
+        ", XF86AudioPrev, exec, ${player} previous"
       ];
 
       bindm = [

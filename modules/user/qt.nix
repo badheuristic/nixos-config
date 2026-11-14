@@ -1,6 +1,6 @@
 { config, pkgs, lib, theme, ... }:
 
-# Qt apps (KDE Connect, qbittorrent, pcsx2, ...) through qt6ct/qt5ct with a
+# Qt apps (KDE Connect, pcsx2, ...) through qt6ct/qt5ct with a
 # Fusion style and a palette generated from theme.nix.
 let
   c = name: "#ff${theme.${name}}";

@@ -1,7 +1,7 @@
 { config, pkgs, lib, theme, ... }:
 
 # Closs — the Quickshell island that replaces waybar, rofi, mako, the
-# OSD scripts, swaylock and the polkit agent. QML lives in ./closs; the
+# OSD scripts, the tray and the polkit agent. QML lives in ./closs; the
 # palette is generated from theme.nix.
 let
   home = config.home.homeDirectory;

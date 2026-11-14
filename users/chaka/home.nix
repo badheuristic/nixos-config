@@ -32,12 +32,11 @@ in
     ../../modules/user/yazi.nix
     ../../modules/user/tmux.nix
     ../../modules/user/fastfetch.nix
+    ../../modules/user/vscode.nix
     ../../modules/user/obsidian.nix
     ../../modules/user/spicetify.nix
     ../../modules/user/vesktop.nix
-    ../../modules/user/obs.nix
     ../../modules/user/swayimg.nix
-    ../../modules/user/vscode.nix
   ];
 
   home.username = "chaka";
@@ -83,7 +82,11 @@ in
     # Media, Notes & Apps
     # mixxx
     # slsk-batchdl
-    qbittorrent
+    motrix
+    # screen recording: Kooha for quick clips, GPU Screen Recorder for
+    # hardware-encoded capture and replays (setcap wrapper: configuration.nix)
+    kooha
+    gpu-screen-recorder-gtk
     mpv
     imagemagick
     ffmpeg

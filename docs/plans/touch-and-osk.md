@@ -66,7 +66,7 @@ the pen, and nothing needs a right click or a hotkey.
 ## Phase 4: polish
 
 - Window close and maximize by touch: a long-press on a window could open a small island menu (close / fullscreen / float). This replaces the title bar the rice doesn't have.
-- Lock screen: make sure the password field opens the OSK. hyprlock and closs-lock run before the session OSK, so the lock view may need its own on-screen number/letter pad.
+- Lock screen: make sure the password field opens the OSK. hyprlock runs above the session OSK (wvkbd has an above_lock rule, so check it actually receives input there).
 - Polkit and keyring prompts: the polkit view is in the island, so check that the OSK shows above it. The gcr keyring prompt is a normal GTK4 window and should get the OSK through text-input.
 
 ## Things to verify first

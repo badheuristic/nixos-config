@@ -128,10 +128,39 @@ let
     .main-globalNav-searchInputWrapper, .main-globalNav-searchInputContainer [class*="form-input-icon__icon"] { background: transparent !important; }
 
     /* menus */
+    /* the blur sits on a pseudo-element: backdrop-filter on the menu itself
+       would trap submenus inside it (scrolling) instead of beside it */
     .main-contextMenu-menu, [data-tippy-root] > div {
-      background-color: ${rgba "surface" "0.78"} !important; backdrop-filter: blur(30px) saturate(160%) !important;
+      background-color: transparent !important;
       border: 1px solid rgba(255,255,255,0.07) !important; border-radius: 10px !important; box-shadow: 0 12px 32px rgba(0,0,0,0.45) !important;
     }
+    [data-tippy-root] > div, [data-tippy-root] > .main-contextMenu-menu { position: relative; isolation: isolate; }
+    [data-tippy-root] > div::before, [data-tippy-root] > .main-contextMenu-menu::before {
+      content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+      background-color: ${rgba "surface" "0.85"}; backdrop-filter: blur(30px) saturate(160%);
+    }
+
+    /* shortcut hints: soft keycaps, no fade band behind them */
+    kbd { background: rgba(255,255,255,0.08) !important; box-shadow: none !important; border: none !important; border-radius: 5px !important; color: #${theme.fg_dim} !important; }
+    .main-globalNav-searchInputTextWrapper span:has(> kbd) { background: none !important; }
+
+    /* quick search (Ctrl+K): one glass sheet like the island launcher */
+    .GenericModal__overlay:has(input[role="combobox"]) { background-color: rgba(0,0,0,0.45) !important; backdrop-filter: blur(6px) !important; }
+    .GenericModal__overlay [role="dialog"] > div:has(input[role="combobox"]) {
+      background-color: ${rgba "surface" "0.88"} !important; backdrop-filter: blur(40px) saturate(160%) !important;
+      border-radius: 16px !important; border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55) !important;
+    }
+    .GenericModal__overlay [role="dialog"] > div:has(input[role="combobox"]) > div { background: transparent !important; border-radius: 0 !important; }
+    .GenericModal__overlay div:has(> input[role="combobox"]) {
+      background-color: rgba(255,255,255,0.07) !important; border-radius: 10px !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06) !important;
+    }
+    .GenericModal__overlay input[role="combobox"] { color: #${theme.fg} !important; }
+    .GenericModal__overlay div:has(> input[role="combobox"]) svg { fill: #${theme.fg_dim} !important; color: #${theme.fg_dim} !important; }
+    .GenericModal__overlay [role="option"] { border-radius: 8px !important; }
+    .GenericModal__overlay [role="option"][aria-selected="true"] { background-color: rgba(255,255,255,0.08) !important; }
+    .GenericModal__overlay [role="option"] > div[aria-hidden="true"]:last-child > span { background: rgba(255,255,255,0.06) !important; border-radius: 6px !important; }
     .main-contextMenu-menu button, .main-contextMenu-menu a { border-radius: 6px !important; }
     .os-scrollbar-handle { background: rgba(255,255,255,0.14) !important; border-radius: 4px !important; }
     /* Apple-sized titles instead of Spotify's poster type */
@@ -168,8 +197,12 @@ let
       box-shadow: 0 10px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.06) !important;
     }
     /* room to scroll the last rows out from under the bar */
-    .main-view-container__scroll-node-child, .Root__nav-bar [data-overlayscrollbars-contents],
-    .Root__right-sidebar [data-overlayscrollbars-contents] { padding-bottom: 96px !important; }
+    .main-nowPlayingView-panel,
+    .Root__nav-bar [data-overlayscrollbars-viewport] > :first-child,
+    .Root__right-sidebar [data-overlayscrollbars-viewport] > :first-child { padding-bottom: 128px !important; }
+    /* the main view is pinned to the window height and its pages overflow it,
+       so padding there never shows; a spacer after the page does */
+    .main-view-container__scroll-node-child > main::after { content: ""; display: block; height: 128px; }
   '';
 
   clossTheme = pkgs.runCommand "spicetify-closs" { } ''

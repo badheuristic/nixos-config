@@ -3,7 +3,7 @@
 
 // Closs — a single morphing island for Hyprland.
 // Wallpaper, status, launcher, control centre, notifications, OSD, polkit
-// agent, power menu and lock screen are all states of one surface.
+// agent, power menu and tray are all states of one surface.
 
 import QtQuick
 import Quickshell
@@ -11,7 +11,6 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import qs.services
 import qs.island
-import qs.lock
 
 ShellRoot {
     id: shell
@@ -26,13 +25,10 @@ ShellRoot {
         Island {}
     }
 
-    LockScreen {}
-
     // Make sure singletons with side effects start immediately.
     Component.onCompleted: {
         Notifs.dnd;
         Polkit.registered;
-        Session.locked;
     }
 
     // ── IPC: `qs -c closs ipc call <target> <fn> [args]` ─────────────
@@ -58,7 +54,6 @@ ShellRoot {
     IpcHandler {
         target: "lock"
         function lock(): void { Session.lock(); }
-        function isLocked(): bool { return Session.locked; }
     }
 
     IpcHandler {
@@ -127,6 +122,12 @@ ShellRoot {
                 name: "armoury"
                 description: "Toggle the Armoury panel (ROG hardware controls)"
                 onPressed: Closs.toggle("armoury")
+            }
+            GlobalShortcut {
+                appid: "closs"
+                name: "tray"
+                description: "Toggle the tray"
+                onPressed: Closs.toggle("tray")
             }
             GlobalShortcut {
                 appid: "closs"

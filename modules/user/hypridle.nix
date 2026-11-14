@@ -1,8 +1,9 @@
 { config, pkgs, ... }:
 
-# Idle → lock via the island (same timings as the old swayidle setup).
+# Idle → lock. The shell picks the hyprlock config matching the island;
+# if the shell isn't running, hyprlock starts with its default config.
 let
-  lock = "${pkgs.quickshell}/bin/qs -c closs ipc call lock lock";
+  lock = "${pkgs.quickshell}/bin/qs -c closs ipc call lock lock || pidof hyprlock || hyprlock";
 in
 {
   services.hypridle = {

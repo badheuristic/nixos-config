@@ -86,6 +86,14 @@ in
       --font-text-theme: "${theme.font.ui}";
       --font-monospace-theme: "${theme.font.mono}";
     }
+
+    /* a settings sub-page's sticky title bar (and the shadow that fades it
+       out) is drawn in the modal's colour, a shade lighter than the page,
+       which showed as a grey band dissolving into a gradient; match the page */
+    .vertical-tab-content .setting-page-titlebar {
+      background-color: var(--background-primary);
+      box-shadow: 0 var(--size-4-2) var(--size-4-2) 0 var(--background-primary);
+    }
   '';
 
   home.activation.obsidianSnippet = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

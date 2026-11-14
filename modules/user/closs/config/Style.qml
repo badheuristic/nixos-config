@@ -22,7 +22,6 @@ Singleton {
     readonly property int restRadius: 14
     readonly property int radius: 28          // expanded island corner radius
     readonly property int pad: 16             // inner padding of expanded views
-    readonly property int windowSpan: 780     // height of the island's layer surface
 
     // ── Cards & controls ────────────────────────────────────────────────
     readonly property int cardRadius: 18

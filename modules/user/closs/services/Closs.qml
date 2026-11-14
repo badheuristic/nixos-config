@@ -14,7 +14,7 @@ Singleton {
     id: root
 
     // Views that the user can open. "rest" is the idle pill.
-    readonly property var views: ["dashboard", "launcher", "clipboard", "control", "calendar", "power", "wallpaper", "armoury"]
+    readonly property var views: ["dashboard", "launcher", "clipboard", "control", "calendar", "power", "wallpaper", "armoury", "tray"]
 
     property string view: "rest"
     property string ambient: ""
@@ -43,6 +43,13 @@ Singleton {
             close();
         else
             open(name);
+    }
+
+    // tray: which app's menu the tray view opens on
+    property string trayItem: ""
+    function openTray(id: string): void {
+        trayItem = id;
+        open("tray");
     }
 
     function close(): void {

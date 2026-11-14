@@ -1,5 +1,7 @@
 import QtQuick
 import Quickshell
+import Quickshell.Widgets
+import Quickshell.Services.SystemTray
 import qs.config
 import qs.services
 import qs.components
@@ -159,6 +161,87 @@ Item {
             subtitle: Style.notch ? "Notch · click for pill" : "Pill · click for notch"
             active: false
             onClicked: Style.setNotch(!Style.notch)
+        }
+
+        // tray: click an app for its menu in the island
+        Card {
+            width: parent.width
+            height: 48
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Closs.openTray("")
+            }
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
+
+                Repeater {
+                    model: SystemTray.items.values.slice(0, 9)
+
+                    Item {
+                        id: trayApp
+                        required property var modelData
+                        width: 34
+                        height: 34
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 10
+                            color: Colors.surface2
+                            opacity: trayMouse.containsMouse ? 1 : 0
+                            Behavior on opacity {
+                                NumberAnimation { duration: Style.quick }
+                            }
+                        }
+                        IconImage {
+                            anchors.centerIn: parent
+                            implicitSize: 18
+                            source: trayApp.modelData.icon
+                            asynchronous: true
+                        }
+                        MouseArea {
+                            id: trayMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+                            onClicked: e => e.button === Qt.MiddleButton ? trayApp.modelData.secondaryActivate() : Closs.openTray(trayApp.modelData.id)
+                        }
+                    }
+                }
+            }
+
+            Txt {
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
+                visible: SystemTray.items.values.length === 0
+                text: "No apps in the tray"
+                color: Colors.fgDim
+                font.pixelSize: Style.fontSm
+            }
+            Txt {
+                anchors.right: trayChevron.left
+                anchors.rightMargin: 2
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Tray"
+                color: Colors.fgDim
+                font.pixelSize: Style.fontSm
+            }
+            Icon {
+                id: trayChevron
+                anchors.right: parent.right
+                anchors.rightMargin: 14
+                anchors.verticalCenter: parent.verticalCenter
+                icon: "chevron_right"
+                size: 18
+                color: Colors.fgDim
+            }
         }
 
         SliderCard {

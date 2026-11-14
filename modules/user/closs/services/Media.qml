@@ -4,12 +4,21 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
 
-// Picks the most relevant MPRIS player: whichever is playing, else the
-// last one that was.
+// Picks the most relevant MPRIS player: Spotify whenever it's running,
+// otherwise whichever is playing, else the last one that was. Browsers are
+// left out so the controls never pause a video by accident (the media keys
+// in hyprland.nix follow the same rule through playerctl).
 Singleton {
     id: root
 
-    readonly property list<MprisPlayer> players: Mpris.players.values
+    // Zen and other Firefox builds register as firefox.instance_*,
+    // Chromium-based browsers as chromium.instance_*
+    function isBrowser(p: MprisPlayer): bool {
+        return /^(firefox|chromium|zen|brave|vivaldi)/i.test(p.dbusName.replace("org.mpris.MediaPlayer2.", ""));
+    }
+
+    readonly property list<MprisPlayer> players: Mpris.players.values.filter(p => !isBrowser(p))
+    readonly property MprisPlayer spotify: players.find(p => p.dbusName === "org.mpris.MediaPlayer2.spotify") ?? null
     property MprisPlayer last: null
 
     // Kept separate from `player` so remembering `last` can't loop back.
@@ -17,6 +26,8 @@ Singleton {
     onPlayingPlayerChanged: if (playingPlayer) last = playingPlayer
 
     readonly property MprisPlayer player: {
+        if (spotify)
+            return spotify;
         if (playingPlayer)
             return playingPlayer;
         if (last && players.includes(last))

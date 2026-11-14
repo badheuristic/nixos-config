@@ -1,8 +1,8 @@
-{ pkgs, lib, theme, ... }:
+{ pkgs, theme, ... }:
 
-# VS Code: a "Closs" colour theme generated from the palette, and a
-# pared-back workbench (no minimap, breadcrumbs, command centre or borders;
-# every pane shares one background so the editor reads as a single sheet).
+# VS Code's "Closs" colour theme, generated from the palette. Only the theme
+# is managed here; VS Code itself owns settings.json, keybindings and the
+# rest of its extensions (the package is installed below).
 let
   c = name: "#${theme.${name}}";
   a = name: alpha: "#${theme.${name}}${alpha}"; # with alpha, e.g. a "primary" "40"
@@ -25,21 +25,21 @@ let
     "sash.hoverBorder" = c "surface3";
     "progressBar.background" = c "primary";
 
-    # one background everywhere, no dividers
+    # one background for the editor; the side bars sit a shade deeper
     "editor.background" = c "bg";
     "editor.foreground" = c "fg";
-    "sideBar.background" = c "bg";
-    "sideBar.border" = none;
+    "sideBar.background" = c "bg_alt"; # a deeper well, so it reads apart from the editor
+    "sideBar.border" = c "surface2";
     "sideBar.foreground" = c "fg_dim";
     "sideBarTitle.foreground" = c "fg_faint";
-    "sideBarSectionHeader.background" = c "bg";
+    "sideBarSectionHeader.background" = c "bg_alt";
     "sideBarSectionHeader.border" = none;
     "sideBarSectionHeader.foreground" = c "fg_dim";
-    "activityBar.background" = c "bg";
+    "activityBar.background" = c "bg_alt";
     "activityBar.border" = none;
     "activityBar.foreground" = c "fg";
     "activityBar.inactiveForeground" = c "fg_faint";
-    "activityBar.activeBorder" = none;
+    "activityBar.activeBorder" = c "primary";
     "activityBarTop.foreground" = c "fg";
     "activityBarTop.inactiveForeground" = c "fg_faint";
     "activityBarTop.activeBorder" = c "primary";
@@ -304,89 +304,15 @@ let
   };
 in
 {
+  # links the theme into ~/.vscode/extensions; with no userSettings or
+  # keybindings set, Home Manager writes nothing else and the folder stays
+  # writable for Marketplace installs
   programs.vscode = {
     enable = true;
-    # native Wayland (sharp text at fractional scale) with IME support;
-    # Electron can't detect a keyring under Hyprland, so name it
+    # native Wayland with IME; Electron can't detect a keyring under Hyprland
     package = pkgs.vscode.override {
       commandLineArgs = "--ozone-platform-hint=auto --enable-wayland-ime --password-store=gnome-libsecret";
     };
-
-    profiles.default = {
-      enableUpdateCheck = false;
-      enableExtensionUpdateCheck = false;
-      extensions = [
-        clossTheme
-        pkgs.vscode-extensions.jnoortheen.nix-ide
-      ];
-
-      userSettings = {
-        # look
-        "workbench.colorTheme" = "Closs";
-        "workbench.preferredDarkColorTheme" = "Closs";
-        "workbench.iconTheme" = "vs-minimal";
-        "workbench.productIconTheme" = "Default";
-        "editor.fontFamily" = "'${theme.font.mono}', monospace";
-        "editor.fontSize" = 14;
-        "editor.lineHeight" = 1.6;
-        "editor.fontLigatures" = true;
-        "terminal.integrated.fontFamily" = "'${theme.font.mono}'";
-        "terminal.integrated.fontSize" = 14;
-        "editor.semanticHighlighting.enabled" = true;
-        "editor.bracketPairColorization.enabled" = true;
-
-        # chrome: as little as possible
-        "window.titleBarStyle" = "custom";
-        "window.commandCenter" = false;
-        "window.menuBarVisibility" = "toggle"; # Alt shows it
-        "window.controlsStyle" = "hidden";     # Hyprland closes windows
-        "window.dialogStyle" = "custom";
-        "window.title" = "\${rootName}\${separator}\${activeEditorShort}";
-        "workbench.layoutControl.enabled" = false;
-        "workbench.activityBar.location" = "top";
-        "workbench.editor.tabActionLocation" = "right";
-        "workbench.editor.tabSizing" = "shrink";
-        "workbench.editor.showIcons" = false;
-        "workbench.editor.empty.hint" = "hidden";
-        "workbench.startupEditor" = "none";
-        "workbench.tips.enabled" = false;
-        "workbench.tree.indent" = 14;
-        "workbench.tree.renderIndentGuides" = "onHover";
-        "workbench.list.smoothScrolling" = true;
-        "breadcrumbs.enabled" = false;
-        "chat.commandCenter.enabled" = false;
-        "explorer.compactFolders" = false;
-        "explorer.decorations.badges" = false;
-
-        # editor surface
-        "editor.minimap.enabled" = false;
-        "editor.stickyScroll.enabled" = false;
-        "editor.glyphMargin" = false;
-        "editor.folding" = true;
-        "editor.showFoldingControls" = "mouseover";
-        "editor.renderLineHighlight" = "line";
-        "editor.overviewRulerBorder" = false;
-        "editor.hideCursorInOverviewRuler" = true;
-        "editor.scrollbar.verticalScrollbarSize" = 8;
-        "editor.scrollbar.horizontalScrollbarSize" = 8;
-        "editor.padding.top" = 12;
-        "editor.guides.indentation" = true;
-        "editor.renderWhitespace" = "none";
-        "editor.lightbulb.enabled" = "off";
-        "editor.cursorBlinking" = "smooth";
-        "editor.cursorSmoothCaretAnimation" = "on";
-        "editor.smoothScrolling" = true;
-        "editor.inlayHints.enabled" = "offUnlessPressed";
-        "editor.codeLens" = false;
-        "scm.diffDecorations" = "gutter";
-
-        # quiet
-        "telemetry.telemetryLevel" = "off";
-        "update.mode" = "none";
-        "extensions.ignoreRecommendations" = true;
-        "git.openRepositoryInParentFolders" = "never";
-        "security.workspace.trust.enabled" = false;
-      };
-    };
+    profiles.default.extensions = [ clossTheme ];
   };
 }
