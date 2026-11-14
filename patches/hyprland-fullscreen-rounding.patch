@@ -1,0 +1,48 @@
+--- a/src/render/Renderer.cpp	2026-11-14 06:34:46.320383982 -0500
++++ b/src/render/Renderer.cpp	2026-11-14 06:35:20.481240654 -0500
+@@ -6,6 +6,7 @@
+ #include <cmath>
+ #include <filesystem>
+ #include "../config/ConfigValue.hpp"
++#include "../config/shared/complex/ComplexDataTypes.hpp"
+ #include "../config/legacy/ConfigManager.hpp"
+ #include "../pointer/cursor/CursorManager.hpp"
+ #include "../pointer/PointerManager.hpp"
+@@ -589,13 +590,35 @@
+     const bool USE_WORKSPACE_FADE_ALPHA = pWindow->m_monitorMovedFrom != -1 && (!PWORKSPACE || !PWORKSPACE->isVisible());
+ 
+     renderdata.surface   = pWindow->wlSurface()->resource();
+-    renderdata.dontRound = Fullscreen::controller()->getFullscreenModes(pWindow).internal == Fullscreen::FSMODE_FULLSCREEN;
++    // Corners follow the window into and out of fullscreen: within the outer
++    // gap of a monitor edge the radius shrinks with the distance to it, so
++    // it animates with the geometry instead of snapping square. Tiled windows
++    // sit at least one gap away and keep their full radius.
++    const bool FSFULL     = Fullscreen::controller()->getFullscreenModes(pWindow).internal == Fullscreen::FSMODE_FULLSCREEN;
++    float      roundScale = FSFULL ? 0.F : 1.F;
++    if (!standalone && !ignorePosition && pWindow->rounding() > 0) {
++        static auto PGAPSOUTDATA = CConfigValue<Config::IComplexConfigValue>("general:gaps_out");
++        const auto* GAPS         = sc<Config::CCssGapData*>(PGAPSOUTDATA.ptr());
++        const auto  GPOS         = pWindow->position(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
++        const auto  GSIZE        = pWindow->size(Desktop::View::IGeometric::GEOMETRIC_CURRENT);
++        const bool  ANIM = GPOS != pWindow->position(Desktop::View::IGeometric::GEOMETRIC_GOAL) || GSIZE != pWindow->size(Desktop::View::IGeometric::GEOMETRIC_GOAL);
++        const double REF = std::max<double>(1.0, std::min<double>({GAPS->m_top, GAPS->m_right, GAPS->m_bottom, GAPS->m_left}));
++        if (FSFULL || ANIM) {
++            const auto   MPOS  = pMonitor->m_position;
++            const auto   MSIZE = pMonitor->m_size;
++            const double INSET = std::min({GPOS.x - MPOS.x, GPOS.y - MPOS.y, MPOS.x + MSIZE.x - (GPOS.x + GSIZE.x), MPOS.y + MSIZE.y - (GPOS.y + GSIZE.y)});
++            // off-screen while animating (slides, pop-ins): leave the corners alone
++            if (FSFULL || INSET >= 0)
++                roundScale = std::clamp(sc<float>(INSET / REF), 0.F, 1.F);
++        }
++    }
++    renderdata.dontRound = roundScale <= 0.F;
+     renderdata.fadeAlpha = pWindow->alphaValue(WINDOW_ALPHA_FADE) * pWindow->alphaValue(WINDOW_ALPHA_FULLSCREEN) * pWindow->alphaValue(WINDOW_ALPHA_LAYOUT) *
+         (pWindow->m_pinned || USE_WORKSPACE_FADE_ALPHA ? 1.f : PWORKSPACE->m_alpha->value()) *
+         (USE_WORKSPACE_FADE_ALPHA ? pWindow->alphaValue(WINDOW_ALPHA_MOVE_TO_WORKSPACE) : 1.F) * pWindow->alphaValue(WINDOW_ALPHA_MOVE_FROM_WORKSPACE);
+     renderdata.alpha         = pWindow->alphaValue(WINDOW_ALPHA_ACTIVE);
+     renderdata.decorate      = decorate && !pWindow->m_X11DoesntWantBorders && Fullscreen::controller()->getFullscreenModes(pWindow).internal != Fullscreen::FSMODE_FULLSCREEN;
+-    renderdata.rounding      = standalone || renderdata.dontRound ? 0 : pWindow->rounding() * pMonitor->m_scale;
++    renderdata.rounding      = standalone || renderdata.dontRound ? 0 : pWindow->rounding() * roundScale * pMonitor->m_scale;
+     renderdata.roundingPower = standalone || renderdata.dontRound ? 2.0f : pWindow->roundingPower();
+     renderdata.blur          = !standalone && shouldBlur(pWindow);
+     renderdata.pWindow       = pWindow;

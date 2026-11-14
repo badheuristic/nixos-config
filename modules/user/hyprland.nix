@@ -1,231 +1,61 @@
-{ config, pkgs, theme, ... }:
+{ config, pkgs, lib, theme, ... }:
 
+# Hyprland, keyed to the same muscle memory as the old sway config
+# (Corne home-row actions on Y/U/I/O/P, Q-T workspaces), with the
+# Closs island handling every piece of shell UI.
+let
+  qs = "${pkgs.quickshell}/bin/qs -c closs ipc call";
+  rgba = hex: alpha: "rgba(${hex}${alpha})";
+
+  # Super+Space: hop between tiled and floating windows (sway's focus mode_toggle)
+  focusModeToggle = pkgs.writeShellScript "hypr-focus-mode-toggle" ''
+    if [ "$(${pkgs.hyprland}/bin/hyprctl activewindow -j | ${pkgs.jq}/bin/jq -r .floating)" = "true" ]; then
+      ${pkgs.hyprland}/bin/hyprctl dispatch cyclenext tiled
+    else
+      ${pkgs.hyprland}/bin/hyprctl dispatch cyclenext floating
+    fi
+  '';
+
+  screenshotDir = "${config.home.homeDirectory}/Pictures/screenshots";
+in
 {
   wayland.windowManager.hyprland = {
     enable = true;
+    # Use the compositor + portal from the NixOS module (programs.hyprland)
+    package = null;
+    portalPackage = null;
+    # Export the full session environment (PATH, XDG_DATA_DIRS, ...) so the
+    # island's systemd service sees the same apps and icons as the desktop.
+    systemd.variables = [ "--all" ];
     configType = "hyprlang";
+
     settings = {
-      # variables
       "$mod" = "SUPER";
-      "$terminal" = "kitty";
+      "$term" = "kitty";
+      "$browser" = "zen-beta";
 
-      # autostart
-      exec-once = [
-        "waybar"
-        "dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-        "swaybg -i ${../../assets/checker.png} -m fill"
-      ];
-
-      # input
-      input = {
-        kb_layout = "us";
-	      follow_mouse = 1;
-	      sensitivity = 0;
-	      touchpad = {
-	        natural_scroll = true;
-	        disable_while_typing = true;
-	        tap-to-click = true;
-	      };
-      };
-
-      gesture = [ "3, horizontal, workspace" ];
-
-      # appearance
-      general = {
-        gaps_in = 4;
-        gaps_out = 8;
-        border_size = 1;
-        # "col.active_border" = "0x77ffffff 0x11181818 0x77ffffff 30deg";
-        # "col.inactive_border" = "0xff181800";
-        "col.active_border" = "0x77ffffff";
-        "col.inactive_border" = "0x55555555";
-        resize_on_border = false;
-        allow_tearing = false;
-        layout = "dwindle";
-        no_focus_fallback = true;
-      };
-
-      decoration = {
-        rounding = 8;
-        rounding_power = 2;
-        active_opacity = 1;
-        inactive_opacity = 0.9;
-        fullscreen_opacity = 0.95;
-        blur = {
-          enabled = false;
-        };
-        shadow = {
-          enabled = false;
-          range = 15;              # creates a soft blur instead of a sharp edge
-          render_power = 3;        # controls the falloff gradient of the shadow
-          offset = "0 0";          # centers the shadow directly behind the window
-          color = "rgba(${theme.shadow}B3)"; # 70% opacity black
-          color_inactive = "rgba(${theme.shadow}80)"; # 50% opacity black
-        };
-      };
-
-      animations = {
-        enabled = true;
-	      bezier = [
-          "easeOutQuint,0.23,1,0.32,1"
-          "easeInOutCubic,0.65,0.05,0.36,1"
-          "linear,0,0,1,1"
-          "almostLinear,0.5,0.5,0.75,1.0"
-          "quick,0.15,0,0.1,1"
-	      ];
-	      animation = [
-          "global, 1, 10, default"
-          "border, 1, 5.39, easeOutQuint"
-          "windows, 1, 4.79, easeOutQuint"
-          "windowsIn, 1, 4.1, easeOutQuint, popin 87%"
-          "windowsOut, 1, 1.49, linear, popin 87%"
-          "fadeIn, 1, 1.73, almostLinear"
-          "fadeOut, 1, 1.46, almostLinear"
-          "fade, 1, 3.03, quick"
-          "layers, 1, 3.81, easeOutQuint"
-          "layersIn, 1, 4, easeOutQuint, fade"
-          "layersOut, 1, 1.5, linear, fade"
-          "fadeLayersIn, 1, 1.79, almostLinear"
-          "fadeLayersOut, 1, 1.39, almostLinear"
-          "workspaces, 1, 1.94, almostLinear, fade"
-          "workspacesIn, 1, 1.21, almostLinear, fade"
-          "workspacesOut, 1, 1.94, almostLinear, fade"
-	      ];
-      };
-
-      dwindle = {
-	      preserve_split = true;
-      };
-
-      master = {
-        new_status = "master";
-      };
-
-      misc = {
-        force_default_wallpaper = 0;
-	      disable_hyprland_logo = true;
-      };
-
-      # window rules
-      windowrule = [
-        "match:title ^(Picture-in-Picture)$,float true,pin true"
-        "match:class .*,suppress_event maximize"
-        "match:class ^$,match:title ^$,match:xwayland true,match:float true,match:fullscreen false,match:pin false,no_focus true"
-        "match:class hyprland-run,move 20 monitor_h-120,float yes"
-        "match:initial_class ^(zen-beta)$,opacity 1.0 override 1.0 override 1.0 override"
-        "match:initial_class ^(kitty)$,opacity 0.87 override 0.83 override 0.87 override"
-        "match:initial_class ^(obsidian)$,opacity 0.97 override 0.87 override 1.0 override"
-        "match:title ^(btop)$,opacity 0.9 0.87"
-        "match:initial_class ^(mpv)$,opacity 1.0 override 1.0 override 1.0 override"
-        "match:initial_class ^(com.github.xournalpp.xournalpp)$,opacity 0.90 0.87"
-        "match:class ^(hhd-ui)$,float true,pin true,stay_focused true,focus_on_activate true"
-        "match:class ^(Spotify|spotify)$,opacity 0.90 override 0.87 override"
-        "match:class ^(vesktop|discord)$,opacity 0.90 override 0.87 override"
-        "match:class ^(antigravity-ide)$,opacity 0.90 override 0.87 override"
-        "match:initial_class ^(wofi)$,float 1,center 1"
-      ];
-
-      layerrule = [
-        "match:namespace wvkbd, above_lock 2"
-      ];
-
-      # keybindings
-      bind = [
-	      "$mod SHIFT, Q, exit"
-        "$mod, Q, killactive"
-        "$mod, Return, exec, $terminal"
-        "$mod, Space, togglefloating"
-        "$mod, D, exec, pkill wofi || wofi --show run --normal-window"
-        "$mod, P, pseudo"
-        "$mod SHIFT, P, pin"
-        "$mod, V, layoutmsg, togglesplit"
-        "$mod, F, fullscreen"
-        "$mod, M, exec, hyprlock"
-        "$mod, B, exec, flatpak run com.bitwig.BitwigStudio"
-        "$mod, C, exec, grim -g \"$(slurp)\" - | wl-copy"
-        "$mod SHIFT, C, exec, grim - | wl-copy"
-        "$mod CTRL, C, exec, grim -g \"$(slurp)\" ~/Pictures/screenshot_$(date +%F_%H-%M-%S).png"
-        "$mod ALT, C, exec, grim ~/Pictures/screenshot_$(date +%F_%H-%M-%S).png"
-        #"$mod, C, exec, hyprshot -m region --clipboard-only" #TODO: screenshots
-        "$mod SHIFT, Space, exec, $(hyprctl activewindow -j | jq '.floating') && hyprctl dispatch cyclenext tiled || hyprctl dispatch cyclenext floating"
-        "ALT, F8, exec, hyprctl keyword monitor eDP-1,2560x1600@180,auto,1"
-        "ALT, F7, exec, hyprctl keyword monitor eDP-1,2560x1600@60,auto,1"
-        "ALT, bracketleft, exec, hyprctl keyword debug:overlay false && sleep 1 && hyprctl keyword debug:damage_tracking 0 && hyprctl keyword debug:damage_tracking 2"
-        "ALT, bracketright, exec, hyprctl keyword debug:overlay true"
-        "ALT SHIFT, V, exec, cliphist list | wofi --dmenu --normal-window -p \"\" | cliphist decode | wl-copy "
-        "$mod, h, movefocus, l"
-        "$mod, j, movefocus, d"
-        "$mod, k, movefocus, u"
-        "$mod, l, movefocus, r"
-        "$mod SHIFT, h, movewindow, l"
-        "$mod SHIFT, j, movewindow, d"
-        "$mod SHIFT, k, movewindow, u"
-        "$mod SHIFT, l, movewindow, r"
-        "$mod, 1, workspace, 1"
-        "$mod, 2, workspace, 2"
-        "$mod, 3, workspace, 3"
-        "$mod, 4, workspace, 4"
-        "$mod, 5, workspace, 5"
-        "$mod, 6, workspace, 6"
-        "$mod, 7, workspace, 7"
-        "$mod, 8, workspace, 8"
-        "$mod, 9, workspace, 9"
-        "$mod, 0, workspace, 10"
-        "$mod SHIFT, 1, movetoworkspace, 1"
-        "$mod SHIFT, 2, movetoworkspace, 2"
-        "$mod SHIFT, 3, movetoworkspace, 3"
-        "$mod SHIFT, 4, movetoworkspace, 4"
-        "$mod SHIFT, 5, movetoworkspace, 5"
-        "$mod SHIFT, 6, movetoworkspace, 6"
-        "$mod SHIFT, 7, movetoworkspace, 7"
-        "$mod SHIFT, 8, movetoworkspace, 8"
-        "$mod SHIFT, 9, movetoworkspace, 9"
-        "$mod SHIFT, 0, movetoworkspace, 10"
-        "$mod, S, togglespecialworkspace, magic"
-        "$mod SHIFT, S, movetoworkspace, special:magic"
-        "$mod, mouse_down, workspace, e+1"
-        "$mod, mouse_up, workspace, e-1"
-        "$mod, bracketright, exec, brightnessctl s 5%+"
-        "$mod, bracketleft, exec, brightnessctl s 5%-"
-        "$mod SHIFT, bracketleft, exec, wpctl set-volume @DEFAULT_SINK@ 5%+"
-        "$mod SHIFT, bracketright, exec, wpctl set-volume @DEFAULT_SINK@ 5%-"
-        "$mod, O, exec, pkill waybar || waybar"
-      ];
-      
-      binde = [
-        "$mod CTRL, h, resizeactive, -10 0"
-        "$mod CTRL, j, resizeactive, 0 10"
-        "$mod CTRL, k, resizeactive, 0 -10"
-        "$mod CTRL, l, resizeactive, 10 0"
-      ];
-
-      bindm = [
-        "$mod, mouse:272, movewindow"
-        "$mod, mouse:273, resizewindow"
-      ];
-
-      bindel = [
-        ",XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_SINK@ 5%+"
-        ",XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_SINK@ 5%-"
-        ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        ",XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        ",XF86MonBrightnessUp, exec, brightnessctl s 5%+"
-        ",XF86MonBrightnessDown, exec, brightnessctl s 5%-"
-      ];
+      # Electron apps can't detect gnome-keyring under Hyprland; Claude
+      # Desktop's launcher reads this (VS Code/Obsidian get a flag instead)
+      env = [ "CLAUDE_PASSWORD_STORE,gnome-libsecret" ];
 
       monitor = [
-        "eDP-1,preferred,0x0,1"
-        "HDMI-A-1,preferred,2560x0,1"
-        # "HDMI-A-1,2560x1440,0x-1440,1"
+        "eDP-1, 2560x1600@165, 0x0, 1"
+        "HDMI-A-1, preferred, auto-right, 1"
+        ", preferred, auto, 1"
       ];
 
-      env = [
-        "XCURSOR_THEME,Bibata-Modern-Classic"
-        "XCURSOR_SIZE,24"
-      ];
-
-      cursor = {
-        no_hardware_cursors = true;
+      input = {
+        kb_layout = "us";
+        repeat_delay = 200;
+        repeat_rate = 50;
+        follow_mouse = 1;
+        sensitivity = 0;
+        touchpad = {
+          natural_scroll = true;
+          disable_while_typing = true;
+          tap-to-click = true;
+          middle_button_emulation = true;
+        };
       };
 
       device = [
@@ -234,6 +64,256 @@
           output = "eDP-1";
         }
       ];
+
+      gesture = [ "3, horizontal, workspace" ];
+
+      general = {
+        gaps_in = 6;
+        gaps_out = 12;
+        border_size = 1;
+        # A hairline, not a highlight: focus is shown by dimming the rest.
+        "col.active_border" = rgba "ffffff" "26";
+        "col.inactive_border" = rgba "ffffff" "0d";
+        resize_on_border = true;
+        allow_tearing = false;
+        layout = "dwindle";
+      };
+
+      decoration = {
+        rounding = theme.radius.window;
+        rounding_power = 3; # closer to Apple's continuous corners
+        active_opacity = 1.0;
+        inactive_opacity = 1.0;
+
+        # Focus through light, not colour
+        dim_inactive = true;
+        dim_strength = 0.12;
+        dim_special = 0.35;
+        dim_around = 0.4;
+
+        blur = {
+          enabled = true;
+          size = 8;
+          passes = 3;
+          noise = 0.01;
+          vibrancy = 0.18;
+          popups = true;
+        };
+
+        shadow = {
+          enabled = true;
+          range = 28;
+          render_power = 3;
+          offset = "0 8";
+          color = rgba theme.shadow "70";
+          color_inactive = rgba theme.shadow "40";
+        };
+      };
+
+      animations = {
+        enabled = true;
+        bezier = [
+          "spring, 0.32, 1.22, 0.42, 1.0"
+          "emphasized, 0.2, 0.0, 0.0, 1.0"
+          "accel, 0.3, 0.0, 0.8, 0.15"
+          "linear, 0, 0, 1, 1"
+        ];
+        animation = [
+          # No overshoot on open: a springy pop-in grows past its tile and
+          # overlaps the neighbour that is still shrinking out of the way.
+          # Neighbours move a touch faster than the new window grows, and
+          # the new window fades in, so the two never visibly overlap.
+          "windowsIn, 1, 4, emphasized, popin 85%"
+          "fadeIn, 1, 3.5, emphasized"
+          "windowsOut, 1, 2.5, accel, popin 90%"
+          "windowsMove, 1, 3.5, emphasized"
+          "border, 1, 4, emphasized"
+          "fade, 1, 3, emphasized"
+          "fadeDim, 1, 4, emphasized"
+          "layers, 1, 3.5, emphasized, fade"
+          "workspaces, 1, 4.5, emphasized, slide"
+          "specialWorkspace, 1, 4.5, emphasized, slidevert"
+        ];
+      };
+
+      dwindle = {
+        preserve_split = true;
+        smart_split = false;
+      };
+
+      group = {
+        "col.border_active" = rgba "ffffff" "26";
+        "col.border_inactive" = rgba "ffffff" "0d";
+        groupbar = {
+          font_family = theme.font.ui;
+          font_size = 11;
+          height = 20;
+          gradients = false;
+          indicator_height = 0;
+          rounding = 6;
+          "col.active" = rgba theme.surface2 "ff";
+          "col.inactive" = rgba theme.bg_alt "ff";
+          text_color = rgba theme.fg "ff";
+        };
+      };
+
+      misc = {
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+        force_default_wallpaper = 0;
+        background_color = "0x${theme.black}";
+        focus_on_activate = true;
+        # If the island crashes while locked, systemd restarts it and it
+        # re-acquires the lock instead of leaving a dead screen.
+        allow_session_lock_restore = true;
+      };
+
+      cursor = {
+        no_hardware_cursors = true;
+      };
+
+      ecosystem = {
+        no_update_news = true;
+        no_donation_nag = true;
+      };
+
+      # ── Rules ──────────────────────────────────────────────────────────
+      windowrule = [
+        "match:class .*, suppress_event maximize"
+        "match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false, no_focus true"
+        "match:title ^(Picture-in-Picture)$, float true, pin true"
+        "match:class ^(pavucontrol|org.pulseaudio.pavucontrol|nmgui|.blueman-manager-wrapped|blueman-manager)$, float true, size 720 520, center true"
+        "match:class ^(xdg-desktop-portal-gtk)$, float true, center true"
+        "match:class ^(org.kde.kdeconnect.app)$, float true, size 900 640, center true"
+        "match:title ^(game-.*)$, float true, size 1920 1080"
+        "match:class ^(swayimg)$, float true, size 1400 900, center true"
+      ];
+
+      layerrule = [
+        # The island animates itself; don't let Hyprland fade it twice.
+        "match:namespace ^(closs.*)$, no_anim true"
+        "match:namespace wvkbd, above_lock 2"
+      ];
+
+      # ── Binds ──────────────────────────────────────────────────────────
+      bind = [
+        # Apps
+        "$mod, Return, exec, $term"
+        "$mod, B, exec, $browser"
+        "$mod, Y, exec, nautilus"
+
+        # The island (Hyprland global shortcuts registered by the shell)
+        "$mod, D, global, closs:launcher"
+        "$mod, V, global, closs:clipboard"
+        "$mod, A, global, closs:control"
+        "$mod, S, global, closs:dashboard"
+        "$mod, N, global, closs:calendar"
+        "$mod SHIFT, W, global, closs:wallpaper"
+        "$mod, Escape, global, closs:power"
+        "$mod, M, global, closs:lock"
+        ", XF86Launch3, global, closs:armoury" # Armoury Crate key (KEY_PROG3)
+
+        # Session
+        "$mod SHIFT, Escape, exit"
+
+        # Corne home-row actions (Y U I O P)
+        "$mod, U, togglefloating"
+        "$mod, I, fullscreen, 0"
+        "$mod, O, layoutmsg, togglesplit" # flip split orientation
+        "$mod, P, killactive"
+        "$mod, Space, exec, ${focusModeToggle}"
+
+        # Focus / move (vim keys + arrows)
+        "$mod, H, movefocus, l"
+        "$mod, J, movefocus, d"
+        "$mod, K, movefocus, u"
+        "$mod, L, movefocus, r"
+        "$mod, Left, movefocus, l"
+        "$mod, Down, movefocus, d"
+        "$mod, Up, movefocus, u"
+        "$mod, Right, movefocus, r"
+        "$mod SHIFT, H, movewindow, l"
+        "$mod SHIFT, J, movewindow, d"
+        "$mod SHIFT, K, movewindow, u"
+        "$mod SHIFT, L, movewindow, r"
+        "$mod SHIFT, Left, movewindow, l"
+        "$mod SHIFT, Down, movewindow, d"
+        "$mod SHIFT, Up, movewindow, u"
+        "$mod SHIFT, Right, movewindow, r"
+
+        "$mod, Z, submap, resize"
+
+        # Scratchpad
+        "$mod SHIFT, F, movetoworkspacesilent, special:scratch"
+        "$mod, F, togglespecialworkspace, scratch"
+
+        # Screenshots
+        "$mod, C, exec, grim -g \"$(slurp -d)\" - | wl-copy"
+        "$mod SHIFT, C, exec, grim - | wl-copy"
+        ", Print, exec, mkdir -p ${screenshotDir} && grim ${screenshotDir}/$(date +%Y%m%d-%H%M%S).png"
+
+        "$mod SHIFT, G, exec, hyprctl reload"
+
+        # Workspaces: Q W E R T = 1-5, number row = 1-10.
+        # mod+Shift+W is the wallpaper picker, so move-to-2 is mod+Shift+2.
+        "$mod, mouse_down, workspace, e+1"
+        "$mod, mouse_up, workspace, e-1"
+      ]
+      ++ (lib.concatLists (lib.imap1 (i: key: [
+        "$mod, ${key}, workspace, ${toString i}"
+      ] ++ lib.optional (key != "W") "$mod SHIFT, ${key}, movetoworkspace, ${toString i}"
+      ) [ "Q" "W" "E" "R" "T" ]))
+      ++ (lib.concatLists (lib.genList (i: let ws = i + 1; key = toString (lib.mod ws 10); in [
+        "$mod, ${key}, workspace, ${toString ws}"
+        "$mod SHIFT, ${key}, movetoworkspace, ${toString ws}"
+      ]) 10));
+
+      # Repeatable, and allowed on the lock screen
+      bindel = [
+        ", XF86AudioRaiseVolume, exec, ${qs} osd volumeUp"
+        ", XF86AudioLowerVolume, exec, ${qs} osd volumeDown"
+        ", XF86MonBrightnessUp, exec, ${qs} osd brightnessUp"
+        ", XF86MonBrightnessDown, exec, ${qs} osd brightnessDown"
+        # Software binds (the Flow's hardware keys don't always emit events)
+        "$mod, period, exec, ${qs} osd volumeUp"
+        "$mod, comma, exec, ${qs} osd volumeDown"
+        "$mod, bracketright, exec, ${qs} osd brightnessUp"
+        "$mod, bracketleft, exec, ${qs} osd brightnessDown"
+      ];
+
+      bindl = [
+        ", XF86AudioMute, exec, ${qs} osd volumeMute"
+        ", XF86AudioMicMute, exec, ${qs} osd micMute"
+        "$mod, slash, exec, ${qs} osd volumeMute"
+        ", XF86AudioPlay, exec, playerctl play-pause"
+        ", XF86AudioPause, exec, playerctl play-pause"
+        ", XF86AudioNext, exec, playerctl next"
+        ", XF86AudioPrev, exec, playerctl previous"
+      ];
+
+      bindm = [
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+      ];
     };
+
+    # Submaps are order-sensitive, so they live in raw config.
+    extraConfig = ''
+      submap = resize
+      binde = , H, resizeactive, -80 0
+      binde = , J, resizeactive, 0 80
+      binde = , K, resizeactive, 0 -80
+      binde = , L, resizeactive, 80 0
+      binde = , Left, resizeactive, -80 0
+      binde = , Down, resizeactive, 0 80
+      binde = , Up, resizeactive, 0 -80
+      binde = , Right, resizeactive, 80 0
+      bind = , Return, submap, reset
+      bind = , Escape, submap, reset
+      bind = $mod, Z, submap, reset
+      submap = reset
+    '';
   };
+
+  home.packages = with pkgs; [ playerctl jq grim slurp ];
 }

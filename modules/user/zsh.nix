@@ -31,6 +31,11 @@
       # Fallback sequences for alternative terminal compatability
       bindkey "^[[1~" beginning-of-line
       bindkey "^[[4~" end-of-line
+
+      # Aliases
+      alias cc='CLAUDE_CONFIG_DIR=~/.cc claude'
+      alias cc-work='CLAUDE_CONFIG_DIR=~/.cc-work claude'
+      alias vim='nvim'
     '';
   };
   programs.direnv = {

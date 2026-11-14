@@ -24,16 +24,19 @@
       # Flat UI Status Bar Styling
       set -g status-style "bg=#${theme.bg_alt},fg=#${theme.fg}"
       
-      # Left: Session name (Pill)
-      set -g status-left "#[fg=#${theme.primary},bg=#${theme.bg_alt}]#[bg=#${theme.primary},fg=#${theme.bg},bold]#S#[fg=#${theme.primary},bg=#${theme.bg_alt}] "
+      # Left: session name
+      set -g status-left "#[bg=#${theme.primary},fg=#${theme.bg},bold] #S #[default]"
       set -g status-left-length 50
       
-      # Right: Time (Pill)
-      set -g status-right " #[fg=#${theme.primary},bg=#${theme.bg_alt}]#[bg=#${theme.primary},fg=#${theme.bg},bold]%H:%M#[fg=#${theme.primary},bg=#${theme.bg_alt}]"
+      # Right: clock
+      set -g status-right "#[bg=#${theme.primary},fg=#${theme.bg},bold] %H:%M #[default]"
       
-      # Window Tabs (Pills)
-      set -g window-status-format " #[fg=#${theme.alt},bg=#${theme.bg_alt}]#[bg=#${theme.alt},fg=#${theme.fg},bold]#I:#W#[fg=#${theme.alt},bg=#${theme.bg_alt}] "
-      set -g window-status-current-format " #[fg=#${theme.primary},bg=#${theme.bg_alt}]#[bg=#${theme.primary},fg=#${theme.bg},bold]#I:#W#[fg=#${theme.primary},bg=#${theme.bg_alt}] "
+      # Window indicators: flat rectangle on the active window, dim number otherwise
+      set -g window-status-format " #I "
+      set -g window-status-current-format " #I "
+      set -g window-status-style "bg=#${theme.bg_alt},fg=#${theme.alt}"
+      set -g window-status-current-style "bg=#${theme.primary},fg=#${theme.bg},bold"
+      set -g window-status-separator ""
 
       # Floating Term
       bind-key -n M-i display-popup -w 80% -h 80% -E "$SHELL"

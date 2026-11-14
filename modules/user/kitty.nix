@@ -4,32 +4,35 @@
   programs.kitty = {
     enable = true;
     font = {
-      name = "Hack Nerd Font";
-      size = 10.5;
+      name = "Iosevka Term";
+      size = 17;
     };
     settings = {
       background = "#${theme.bg}";
       foreground = "#${theme.fg}";
+      background_opacity = "0.94";
       cursor = "#${theme.fg}";
       cursor_text_color = "#${theme.bg}";
-      selection_background = "#${theme.primary}";
-      selection_foreground = "#${theme.bg}";
-      
-      color0 = "#${theme.bg_alt}";
-      color8 = "#${theme.alt}";
-      color1 = "#${theme.urgent}";
-      color9 = "#${theme.urgent}";
-      color2 = "#${theme.primary}";
-      color10 = "#${theme.primary}";
-      color3 = "#${theme.fg}";
-      color11 = "#${theme.fg}";
-      color4 = "#${theme.fg}";
-      color12 = "#${theme.fg}";
-      color5 = "#${theme.fg}";
-      color13 = "#${theme.fg}";
-      color6 = "#${theme.primary}";
-      color14 = "#${theme.primary}";
-      color7 = "#${theme.fg}";
+      selection_background = "#${theme.surface3}";
+      selection_foreground = "#${theme.fg}";
+      url_color = "#${theme.blue}";
+
+      # neutral 16-colour palette (theme.nix)
+      color0 = "#${theme.surface}";
+      color8 = "#${theme.fg_faint}";
+      color1 = "#${theme.red}";
+      color9 = "#${theme.red}";
+      color2 = "#${theme.green}";
+      color10 = "#${theme.primary_hi}";
+      color3 = "#${theme.yellow}";
+      color11 = "#${theme.yellow}";
+      color4 = "#${theme.blue}";
+      color12 = "#${theme.blue}";
+      color5 = "#${theme.magenta}";
+      color13 = "#${theme.magenta}";
+      color6 = "#${theme.cyan}";
+      color14 = "#${theme.cyan}";
+      color7 = "#${theme.fg_dim}";
       color15 = "#${theme.fg}";
 
       window_padding_width = 15;
@@ -39,6 +42,9 @@
       confirm_os_window_close = 0;
       text_composition_strategy = "legacy";
       cursor_trail = 1;
+
+      # Tabs are handled by tmux now; hide kitty's own tab bar
+      tab_bar_style = "hidden";
     };
   };
 }

@@ -1,59 +1,34 @@
 {
+  # Mount the existing 4GB EFI partition (nvme0n1p1) at /boot without wiping
+  # /boot/EFI/Microsoft so Windows dual-boot stays intact.
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-partuuid/4cb2d933-b4ef-4c98-a7dd-f784985a0cb0";
+    fsType = "vfat";
+    options = [ "umask=0077" ];
+  };
+
+  # Format ONLY the 700GB Linux partition (nvme0n1p2) with plain Btrfs,
+  # leaving the GPT table and Windows partitions (nvme0n1p3..p5) completely untouched.
   disko.devices = {
     disk = {
-      main = {
+      linux = {
         type = "disk";
-	device = "/dev/nvme0n1";
-	content = {
-	  type = "gpt";
-	  partitions = {
-	    boot = {
-	      size = "512M";
-	      type = "EF00";
-	      content = {
-	        type = "filesystem";
-		format = "vfat";
-		mountpoint = "/boot";
-		mountOptions = [ "umask=0077" ];
-	      };
-	    };
-	    luks = {
-	      size = "100%";
-	      content = {
-	        type = "luks";
-		name = "crypted";
-		settings = { allowDiscards = true; };
-		content = {
-		  type = "lvm_pv";
-		  vg = "pool";
-		};
-	      };
-	    };
-	  };
-	};
-      };
-    };
-    lvm_vg = {
-      pool = {
-        type = "lvm_vg";
-        lvs = {
-          swap = {
-            size = "32G";
-            content = {
-              type = "swap";
-      	resumeDevice = true;
+        device = "/dev/disk/by-partuuid/f1612475-d2c5-4259-a2f0-2c06ec2471e6";
+        content = {
+          type = "btrfs";
+          extraArgs = [ "-f" ];
+          subvolumes = {
+            "/root" = {
+              mountpoint = "/";
+              mountOptions = [ "compress=zstd" "noatime" ];
             };
-          };
-          root = {
-            size = "100%FREE";
-            content = {
-              type = "btrfs";
-      	      extraArgs = [ "-f" ];
-      	      subvolumes = {
-      	        "/root" = { mountpoint = "/"; };
-      	        "/home" = { mountpoint = "/home"; };
-      	        "/nix" = { mountpoint = "/nix"; };
-      	      };
+            "/home" = {
+              mountpoint = "/home";
+              mountOptions = [ "compress=zstd" "noatime" ];
+            };
+            "/nix" = {
+              mountpoint = "/nix";
+              mountOptions = [ "compress=zstd" "noatime" ];
             };
           };
         };

@@ -11,7 +11,24 @@
 
     colorschemes.base16 = {
       enable = true;
-      colorscheme = "grayscale-dark";
+      colorscheme = {
+        base00 = "#${theme.bg}";
+        base01 = "#${theme.surface}";
+        base02 = "#${theme.surface2}";
+        base03 = "#${theme.fg_faint}";
+        base04 = "#${theme.fg_dim}";
+        base05 = "#${theme.fg}";
+        base06 = "#${theme.fg}";
+        base07 = "#ffffff";
+        base08 = "#${theme.red}";
+        base09 = "#${theme.orange}";
+        base0A = "#${theme.yellow}";
+        base0B = "#${theme.green}";
+        base0C = "#${theme.cyan}";
+        base0D = "#${theme.blue}";
+        base0E = "#${theme.magenta}";
+        base0F = "#${theme.primary}";
+      };
       settings = {
         transparent_mode = true;
       };
@@ -19,7 +36,7 @@
 
     opts = {
       mouse = "";
-      guicursor = "";
+      guicursor = "n-v-c:block-blinkon1-CursorInsert,i:block-CursorInsert";
       number = true;
       relativenumber = true;
       tabstop = 2;
@@ -35,10 +52,18 @@
       incsearch = true;
       termguicolors = true;
       scrolloff = 8;
-      signcolumn = "yes";
+      # vimichael: no sign gutter, no command bar
+      signcolumn = "no";
+      cmdheight = 0;
       updatetime = 50;
       colorcolumn = "80";
       conceallevel = 3;
+      # vimichael: treesitter folding
+      foldmethod = "expr";
+      foldexpr = "nvim_treesitter#foldexpr()";
+      foldlevel = 99;
+      foldnestmax = 1;
+      splitright = true;
     };
 
     autoCmd = [
@@ -52,10 +77,21 @@
         pattern = [ "*" ];
         command = "hi StatusLine guibg=NONE ctermbg=NONE | hi StatusLineNC guibg=NONE ctermbg=NONE";
       }
+      # vimichael: auto-equalize splits on resize
+      {
+        event = [ "VimResized" ];
+        pattern = [ "*" ];
+        command = "wincmd =";
+      }
     ];
 
     extraConfigLua = ''
       vim.opt.isfname:append('@-@')
+      -- vimichael: invisible split borders (panes distinguished by bg color only)
+      vim.opt.fillchars = {
+        vert = " ", horiz = " ", horizup = " ", horizdown = " ",
+        vertleft = " ", vertright = " ", verthoriz = " "
+      }
     '';
 
     plugins = {
@@ -69,12 +105,15 @@
       };
       lazygit.enable = true;
       tmux-navigator.enable = true;
+
       lualine = {
         enable = true;
         settings = {
           options = {
-            component_separators = { left = ""; right = ""; };
-            section_separators = { left = ""; right = ""; };
+            # vimichael: flat text-only statusline, no powerline arrows
+            component_separators = "";
+            section_separators = "";
+            icons_enabled = false;
             theme = {
               __raw = ''
                 (function()
@@ -90,17 +129,39 @@
               '';
             };
           };
+          # vimichael layout: MODE | branch | filename ... encoding :: format :: filetype | progress | location
           sections = {
-            lualine_a = pkgs.lib.mkForce [ { __unkeyed-1 = "mode"; separator = { left = ""; }; padding = { left = 1; right = 1; }; } ];
-            lualine_b = pkgs.lib.mkForce [ "branch" "filename" ];
-            lualine_c = pkgs.lib.mkForce [ { __unkeyed-1 = "%="; separator = ""; padding = 0; } ];
-            lualine_x = pkgs.lib.mkForce [ "" ];
-            lualine_y = pkgs.lib.mkForce [ "filetype" "progress" ];
-            lualine_z = pkgs.lib.mkForce [ { __unkeyed-1 = "location"; separator = { right = ""; }; padding = { left = 1; right = 1; }; } ];
+            lualine_a = pkgs.lib.mkForce [ "mode" ];
+            lualine_b = pkgs.lib.mkForce [ "branch" ];
+            lualine_c = pkgs.lib.mkForce [ "filename" ];
+            lualine_x = pkgs.lib.mkForce [
+              {
+                __raw = ''
+                  function()
+                    local enc = vim.o.fileencoding
+                    if enc == "" then
+                      return vim.bo.fileformat .. " :: " .. vim.bo.filetype
+                    else
+                      return enc .. " :: " .. vim.bo.fileformat .. " :: " .. vim.bo.filetype
+                    end
+                  end
+                '';
+              }
+            ];
+            lualine_y = pkgs.lib.mkForce [ "progress" ];
+            lualine_z = pkgs.lib.mkForce [ "location" ];
+          };
+          inactive_sections = {
+            lualine_a = pkgs.lib.mkForce [];
+            lualine_b = pkgs.lib.mkForce [];
+            lualine_c = pkgs.lib.mkForce [ "filename" ];
+            lualine_x = pkgs.lib.mkForce [ "location" ];
+            lualine_y = pkgs.lib.mkForce [];
+            lualine_z = pkgs.lib.mkForce [];
           };
         };
       };
-      
+
       treesitter = {
         enable = true;
         settings.highlight.enable = true;
@@ -181,27 +242,27 @@
       { mode = "n"; key = "<leader>sw"; action = "<cmd>SudaWrite<CR>"; options.desc = "write as root"; }
       { mode = "n"; key = "<leader>ev"; action = ":ex "; }
       { mode = "n"; key = "<leader>nn"; action = "<cmd>Ex ~/Notes<CR>"; options.desc = "open Notes"; }
-      
+
       { mode = "v"; key = "J"; action = ":m '>+1<CR>gv=gv"; }
       { mode = "v"; key = "K"; action = ":m '<-2<CR>gv=gv"; }
-      
+
       { mode = "n"; key = "n"; action = "nzzzv"; }
       { mode = "n"; key = "N"; action = "Nzzzv"; }
       { mode = "n"; key = "<C-u>"; action = "<C-u>zz"; }
       { mode = "n"; key = "<C-n>"; action = "<C-d>zz"; }
       { mode = "n"; key = "J"; action = "mzJ`z"; }
-      
+
       { mode = "x"; key = "<leader>p"; action = "\"_dP"; }
       { mode = ["n" "v"]; key = "<leader>y"; action = "\"+y"; }
       { mode = "n"; key = "<leader>Y"; action = "\"+Y"; }
       { mode = ["n" "v"]; key = "<leader>d"; action = "\"_d"; }
-      
+
       { mode = "n"; key = "Q"; action = "<nop>"; }
       { mode = "n"; key = "<C-k>"; action = "<cmd>cnext<CR>"; }
       { mode = "n"; key = "<C-j>"; action = "<cmd>cprev<CR>"; }
       { mode = "n"; key = "<leader>k"; action = "<cmd>lnext<CR>zz"; options.desc = "next on list"; }
       { mode = "n"; key = "<leader>j"; action = "<cmd>lprev<CR>zz"; options.desc = "prev on list"; }
-      
+
       { mode = "n"; key = "<leader>fr"; action = ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/g<Left><Left>"; options.desc = "find and replace"; }
       { mode = "v"; key = "<leader>fr"; action = "\"hy:%s/<C-r>=escape(@h, \"/\\.*^$[]\")<CR>/<C-r>=escape(@h, \"/\\.*^$[]\")<CR>/g<Left><Left>"; options.desc = "find and replace"; }
       { mode = "n"; key = "<leader>x"; action = "<cmd>!chmod +x %<CR>"; options.silent = true; }

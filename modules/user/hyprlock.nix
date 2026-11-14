@@ -1,65 +1,79 @@
 { config, pkgs, theme, ... }:
 
+# Fallback locker only. The island's own lock screen is the primary one; if
+# the shell is ever wedged while locked, from a TTY run:
+#   hyprctl --instance 0 dispatch exec hyprlock
+# Styled to look like the island lock so the fallback isn't jarring.
+let
+  rgb = hex: "rgb(${hex})";
+in
 {
   programs.hyprlock = {
     enable = true;
     settings = {
       general = {
-        disable_loading_bar = true;
         hide_cursor = true;
+        ignore_empty_input = true;
       };
-      
+
       background = [
         {
-          path = "${../../assets/light.png}";
-          blur_passes = 0;
-          blur_size = 0;
+          path = "${config.home.homeDirectory}/Pictures/wallpapers/bedroom.jpg";
+          blur_passes = 3;
+          blur_size = 10;
+          brightness = 0.6;
         }
       ];
 
       label = [
         {
-          text = "$TIME";
-          font_size = 32;
-          font_family = "Hack Nerd Font";
-          color = "rgba(255, 255, 255, 1.0)";
-          position = "80, 130";
-          monitor = "eDP-1";
-          halign = "left";
-          valign = "bottom";
+          text = "cmd[update:60000] date +'%A, %B %-d'";
+          font_size = 22;
+          font_family = theme.font.ui;
+          color = "rgba(255, 255, 255, 0.85)";
+          position = "0, -170";
+          halign = "center";
+          valign = "top";
         }
         {
-          text = "cmd[update:1000] echo \"$(date +'%d %B %Y')\"";
-          font_size = 12;
-          font_family = "Hack Nerd Font";
-          color = "rgba(255, 255, 255, 0.7)";
-          position = "80, 100";
-          monitor = "eDP-1";
-          halign = "left";
+          text = "$TIME";
+          font_size = 220;
+          font_family = "${theme.font.rounded} Black";
+          color = "rgba(255, 255, 255, 0.92)";
+          position = "0, -200";
+          halign = "center";
+          valign = "top";
+        }
+        {
+          text = "$USER";
+          font_size = 15;
+          font_family = "${theme.font.ui} Semibold";
+          color = rgb theme.fg;
+          position = "0, 150";
+          halign = "center";
           valign = "bottom";
         }
       ];
-      
+
       input-field = [
         {
-          size = "150, 40";
-          position = "80, 45";
-          monitor = "eDP-1";
-          halign = "left";
+          size = "220, 40";
+          position = "0, 90";
+          halign = "center";
           valign = "bottom";
-          dots_size = 0.2;
-          dots_spacing = 0.2;
-          dots_center = true;
-          dots_text_format = "＊";
-          fade_on_empty = true;
-          font_family = "Hack Nerd Font";
-          font_color = "rgba(255, 255, 255, 1.0)";
-          inner_color = "rgba(255, 255, 255, 0.1)";
-          outer_color = "rgba(255, 255, 255, 0.5)";
+          rounding = -1;
           outline_thickness = 0;
-          placeholder_text = " ";
-          hide_input = false;
-          rounding = 8;
+          inner_color = rgb theme.black;
+          font_color = rgb theme.fg;
+          check_color = rgb theme.surface2;
+          fail_color = rgb theme.red;
+          dots_size = 0.25;
+          dots_spacing = 0.35;
+          dots_center = true;
+          fade_on_empty = false;
+          placeholder_text = "<span foreground='##${theme.fg_dim}'>Password</span>";
+          fail_text = "Incorrect password";
+          font_family = theme.font.ui;
         }
       ];
     };

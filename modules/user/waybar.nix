@@ -1,142 +1,138 @@
 { config, pkgs, theme, ... }:
 
 {
+  # Waybar configuration from https://github.com/vimichael/arch-i3-cfg/tree/main/waybar
   programs.waybar = {
     enable = true;
     settings = {
       mainBar = {
+        position = "bottom";
+        spacing = 0;
+        height = 0;
+        reload_style_on_change = true;
         layer = "top";
-        position = "top";
-        margin = "8px 8px 0px 8px";
-        height = 30;
-        spacing = 4;
-        
-        modules-left = [ "hyprland/workspaces" "hyprland/window" ];
-        modules-center = [];
-        modules-right = [ "custom/wvkbd" "network" "bluetooth" "pulseaudio" "battery" "temperature" "cpu" "memory" "disk" "clock" "tray" ];
-
-        "custom/wvkbd" = {
-          format = "US";
-          on-click = "pkill -x wvkbd-deskintl || wvkbd-deskintl -L 600 &";
+        "custom/separator" = {
+          format = "::";
+          interval = "once";
           tooltip = false;
         };
-
-        "hyprland/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          format = "{name}";
-          persistent-workspaces = {
-            "*" = [ 1 2 3 4 5 ];
-          };
-        };
-
-        "hyprland/window" = {
-          format = "{title}";
+        modules-left = [
+          "sway/workspaces"
+          "sway/mode"
+        ];
+        modules-center = [
+          "sway/window"
+        ];
+        modules-right = [
+          "tray"
+          "cpu"
+          "custom/separator"
+          "memory"
+          "custom/separator"
+          "battery"
+          "custom/separator"
+          "clock"
+        ];
+        "sway/window" = {
           max-length = 50;
         };
-
-        "clock" = {
-          format = "{:%A %B %d; %H:%M}";
+        tray = {
+          spacing = 10;
           tooltip = false;
         };
-
+        cpu = {
+          format = "cpu {usage}%";
+          interval = 2;
+          states = {
+            critical = 90;
+          };
+        };
+        memory = {
+          format = "mem {percentage}%";
+          interval = 2;
+          states = {
+            critical = 80;
+          };
+        };
+        battery = {
+          format = "bat {capacity}%";
+          interval = 5;
+          states = {
+            warning = 20;
+            critical = 10;
+          };
+          tooltip = false;
+        };
         network = {
-          format-wifi = "  {essid}";
-          format-ethernet = "󰈀 ";
-          format-disconnected = "󰖪 ";
-          on-click = "nmgui";
+          format-wifi = "wifi {bandwidthDownBits}";
+          format-ethernet = "enth {bandwidthDownBits}";
+          format-disconnected = "no network";
+          interval = 5;
           tooltip = false;
         };
-
-        bluetooth = {
-          format = " {status}";
-          format-disabled = "󰂲 ";
-          format-connected = " {device_alias}";
-          on-click = "blueman-manager";
-          tooltip = false;
-        };
-
         pulseaudio = {
-          format = "  {volume}%";
-          format-muted = "  MUTED";
+          scroll-step = 5;
+          max-volume = 150;
+          format = "vol {volume}%";
+          format-bluetooth = "vol {volume}%";
+          nospacing = 1;
           on-click = "pavucontrol";
           tooltip = false;
         };
-
-        battery = {
-          states = { warning = 30; critical = 15; };
-          format = "  {capacity}%";
-          format-charging = "󰂄 {capacity}%";
-          format-plugged = "  {capacity}%";
-          tooltip = false;
-        };
-
-        temperature = {
-          format = " {temperatureC}°C";
-          tooltip = false;
-        };
-
-        cpu = {
-          format = "  {usage}%";
-          tooltip = false;
-        };
-
-        memory = {
-          format = "  {used:0.1f}G";
-          tooltip = false;
-        };
-
-        disk = {
-          format = "  {percentage_used}%";
-          path = "/";
-          tooltip = false;
-        };
-
-        tray = {
-          icon-size = 14;
-          spacing = 10;
+        clock = {
+          format = "{:%a %d %b  %H:%M:%S}";
         };
       };
     };
 
     style = ''
       * {
-        /* font-family: monospace, "DejaVuSansM Nerd Font"; */
-        font-family: sans-serif, "DejaVu Sans";
-        font-size: 13px;
         border: none;
         border-radius: 0;
         min-height: 0;
-        margin: 0;
+        font-family: "Iosevka Term", "Iosevka", monospace;
+        font-size: 16px;
         padding: 0;
-        box-shadow: none;
       }
 
       window#waybar {
-        background-color: alpha(#${theme.bg}, 0.93);
-        color: #${theme.fg};
-        border-radius: 8px;
-        border: 1px solid #${theme.bg_alt};
+        background: #202020;
+        color: #9b8d7f;
       }
 
-      /* Base padding for all modules to prevent text from hitting edges */
-      #workspaces button, #clock, #network, #bluetooth, #pulseaudio, #battery,
-      #window, #temperature, #cpu, #memory, #disk, #tray,
-      #custom-wvkbd {
-        padding: 0 8px;
-        color: #${theme.fg};
-        border-left: 1px solid #${theme.bg_alt};
+      tooltip {
+        background-color: #202020;
       }
 
-      #workspaces button { 
-        color: #${theme.alt}; 
-        border-left: none;
+      #clock,
+      #tray,
+      #cpu,
+      #memory,
+      #battery,
+      #network,
+      #pulseaudio {
+        margin: 2px 2px 0px 0px;
+        padding: 2px 8px;
       }
-      #workspaces button.active { color: #${theme.primary}; }
-      #workspaces button:hover { color: #${theme.urgent}; }
 
-      #battery.charging, #battery.plugged { color: #${theme.primary}; }
-      #battery.critical:not(.charging) { color: #${theme.urgent}; }
+      #workspaces button {
+        color: #9b8d7f;
+        padding: 2px 8px;
+      }
+
+      #workspaces button.focused {
+        background-color: #9b8d7f;
+        color: #202020;
+      }
+
+      #workspaces button.active {
+        background-color: #202020;
+        color: #9b8d7f;
+      }
+
+      #battery, #tray, #clock, #cpu, #pulseaudio, #memory {
+        color: #9b8d7f;
+      }
     '';
   };
 }
