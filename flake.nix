@@ -45,6 +45,8 @@
                 doCheck = false;
               });
               electron_44 = prev.electron_44 or prev.electron_43;
+              # nixpkgs is far behind upstream (1.8 vs 2.x) and unmaintained
+              motrix = final.callPackage ./pkgs/motrix.nix { };
               # window corners animate into/out of fullscreen instead of snapping
               hyprland = prev.hyprland.overrideAttrs (old: {
                 patches = (old.patches or [ ]) ++ [ ./patches/hyprland-fullscreen-rounding.patch ];
