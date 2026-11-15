@@ -218,6 +218,7 @@ in
         "$mod, M, global, closs:lock"
         ", XF86Launch3, global, closs:armoury" # Armoury Crate key (KEY_PROG3)
         "$mod, semicolon, global, closs:armoury"
+        "$mod, minus, exec, ${player} play-pause"
 
         # Session
         "$mod SHIFT, Escape, exit"
