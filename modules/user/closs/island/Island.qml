@@ -22,7 +22,8 @@ Scope {
     // notif) and summoned views still drop down, then leave again.
     readonly property bool hidden: (current === "rest" || current === "workspace") && Compositor.hasFullscreen(modelData)
 
-    // ── Scrim: dims the desktop and catches clicks outside the island ────
+    // ── Scrim: dims the desktop (click-through; the island's own surface
+    // catches clicks outside it, see below) ──────────────────────────────
     PanelWindow {
         id: scrim
 
@@ -39,6 +40,7 @@ Scope {
         WlrLayershell.namespace: "closs-scrim"
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         visible: scope.interactive || shade.opacity > 0
+        mask: Region {}
 
         Rectangle {
             id: shade
@@ -49,12 +51,6 @@ Scope {
             Behavior on opacity {
                 NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
             }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: scope.interactive
-            onClicked: if (!Closs.polkit) Closs.close()
         }
     }
 
@@ -77,18 +73,35 @@ Scope {
         WlrLayershell.namespace: "closs"
         WlrLayershell.keyboardFocus: scope.interactive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        // Only the island itself takes input; the rest of the surface is
-        // click-through.
+        // At rest only the island takes input and the rest of the surface
+        // is click-through. While a view is open the whole surface takes
+        // input so a click anywhere else closes it: Hyprland only sends
+        // clicks to a layer that holds exclusive keyboard focus, so a
+        // separate catcher underneath would never see them.
         mask: Region {
             item: hit
         }
 
         Item {
             id: hit
-            x: body.x - Style.flare
-            y: body.y
-            width: body.width + 2 * Style.flare
-            height: body.height
+            x: scope.interactive ? 0 : body.x - Style.flare
+            y: scope.interactive ? 0 : body.y
+            width: scope.interactive ? win.width : body.width + 2 * Style.flare
+            height: scope.interactive ? win.height : body.height
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: scope.interactive
+            acceptedButtons: Qt.AllButtons
+            // only clicks that miss the island; empty space inside an open
+            // view falls through to here too and must not close it
+            onPressed: m => {
+                const inside = m.x >= body.x && m.x < body.x + body.width
+                    && m.y >= body.y && m.y < body.y + body.height;
+                if (!inside && !Closs.polkit)
+                    Closs.close();
+            }
         }
 
         Item {
